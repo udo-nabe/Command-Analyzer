@@ -18,8 +18,8 @@ public class OptionTest {
      */
     @Test
     void instantiate() {
-        //正常系:Linuxタイプのオプション
-        Option option = new Option("-", "example", Option.ArgType.NONE, true);
+        //正常系:正しくインスタンス化できるか
+        Option option = new Option("-", "e", "example", Option.ArgType.NONE, true);
 
         //接頭辞の確認
         assertEquals("-", option.getPrefix());
@@ -30,7 +30,14 @@ public class OptionTest {
         //引数タイプの確認
         assertEquals(Option.ArgType.NONE, option.getArgType());
 
+        //表示名の確認
+        assertEquals("example", option.getDisplayName());
+
         //必須かどうかの確認
         assertTrue(option.isRequired());
+
+        //異常系:引数に誤りがある場合、正しく例外を送出するか
+        assertThrows(IllegalArgumentException.class, () -> new Option("-", "", "aaa", Option.ArgType.NONE, false));
+        assertThrows(IllegalArgumentException.class, () -> new Option("-", "aaa", "", Option.ArgType.NONE, false));
     }
 }

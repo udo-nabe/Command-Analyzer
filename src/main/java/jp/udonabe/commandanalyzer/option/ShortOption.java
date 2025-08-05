@@ -14,7 +14,7 @@ package jp.udonabe.commandanalyzer.option;
  * このオプションは、まとめることができます。
  */
 public class ShortOption extends Option {
-    public ShortOption(String name, ArgType type, boolean required) {
-        super("-", name, type, required);
+    public ShortOption(String name, String displayName, ArgType type, boolean required) {
+        super("-", name, displayName, type, required);
     }
 }

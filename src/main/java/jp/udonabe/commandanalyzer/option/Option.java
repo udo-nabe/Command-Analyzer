@@ -24,13 +24,20 @@ public class Option {
     /**
      * オプションの接頭辞。空にすることもできます。
      * 空にした場合は、{@link #required}をtrueに設定することを推奨します。
-     * 接頭辞が「-」(ハイフン)の場合は、ショートオプションとみなされ、複数のオプションをまとめられるようになります。
+     * 注意: このクラスを直接インスタンス化しても、子クラス特有の機能(ショートオプションをまとめられるなど)は付与されません。
      */
     private final String prefix;
     /**
      * オプションの名前。
+     * 名前は空にすることができません。
      */
     private final String name;
+    /**
+     * オプションの表示名。
+     * 表示名は空にすることができます。
+     * 空にした場合、ArgTypeをNONEに設定することはできません。
+     */
+    private final String displayName;
     /**
      * 引数の種別。詳細は{@link ArgType}をご覧ください。
      */
@@ -38,7 +45,6 @@ public class Option {
     /**
      * このオプションが必須かどうか。
      * 必須オプションの場合は、コマンドの解析時にこのオプションが無いとエラーになります。
-     * {@link #argType}を{@link ArgType#NONE}に設定する際は、falseにすることを強く推奨します。
      */
     private final boolean required;
 
@@ -49,9 +55,20 @@ public class Option {
      * @param argType 引数の種別。({@link #argType})
      * @param required 必須かどうか。({@link #required})
      */
-    public Option(@NonNull String prefix, @NonNull String name, @NonNull ArgType argType, boolean required) {
+    public Option(@NonNull String prefix, @NonNull String name, String displayName, @NonNull ArgType argType, boolean required) {
+        //引数のチェック
+        if (displayName == null || displayName.isEmpty()) {
+            if (argType == ArgType.NONE) {
+                throw new IllegalArgumentException("If displayName is null or empty, ArgType cannot be NONE.");
+            }
+        }
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The argument 'name' cannot be empty.");
+        }
+
         this.prefix = prefix;
         this.name = name;
+        this.displayName = displayName;
         this.argType = argType;
         this.required = required;
     }
