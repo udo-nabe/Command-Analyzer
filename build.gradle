@@ -1,5 +1,14 @@
+/*
+ * Copyright (c) 2025 Command-Analyzer Contributors.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
 plugins {
     id 'java-library'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.2'
 }
 
 repositories {
@@ -8,6 +17,26 @@ repositories {
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    implementation 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+}
+
+idea.project.settings {
+    copyright {
+        useDefault = 'MIT License'
+        profiles {
+            'MIT License' {
+                notice = '''\
+Copyright (c) 2025 Command-Analyzer Contributors.
+                
+This source code is licensed under the MIT license found in the
+LICENSE file in the root directory of this source tree.
+'''.stripIndent()
+                keyword = 'Copyright'
+            }
+        }
+    }
 }
 
 tasks.named('test') {
