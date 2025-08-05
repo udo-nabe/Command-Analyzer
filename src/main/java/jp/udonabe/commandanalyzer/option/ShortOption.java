@@ -16,5 +16,8 @@ package jp.udonabe.commandanalyzer.option;
 public class ShortOption extends Option {
     public ShortOption(String name, String displayName, ArgType type, boolean required) {
         super("-", name, displayName, type, required);
+        if (displayName.length() != 1) {
+            throw new IllegalArgumentException("The argument 'displayName' must have length 1.");
+        }
     }
 }
