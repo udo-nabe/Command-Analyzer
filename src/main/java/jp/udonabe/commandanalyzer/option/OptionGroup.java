@@ -18,8 +18,14 @@ import java.util.List;
  * @param options グループに所属しているオプション。
  * @param name 管理名。
  */
-public record OptionGroup(String name, List<Option> options) {
-    public OptionGroup(String name, @NonNull Option... options) {
-        this(name, List.of(options));
+public record OptionGroup(String name, Kind kind, List<Option> options) {
+    public OptionGroup(String name, Kind kind, @NonNull Option... options) {
+        this(name, kind, List.of(options));
+    }
+
+    public enum Kind {
+        WRAP,
+        EQUAL,
+        WHICH,
     }
 }
