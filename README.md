@@ -6,8 +6,7 @@
 - -(ハイフン)などLinuxタイプのオプション
 - /などWindowsタイプのオプション
 - プレフィックスがないサブコマンド
-- ヘルプの自動出力 / 
-Function
+- ヘルプの自動出力 <br/>
 Planned.
 - Linux-type options such as -- and -
 - Windows-type options such as /
