@@ -1,5 +1,7 @@
 # Command-Analyzer
-コマンドの基本的なオプション解析を、軽量に行うライブラリ。/ A lightweight library for parsing basic command options.
+コマンドの基本的なオプション解析を、軽量に行うライブラリ。/ A lightweight library for parsing basic command options. <br>
+現在開発中ですが、手軽にオプション解析をしたいという方は、ぜひ応援をお願いします!
+
 
 ## 機能 / Function
 予定です。
