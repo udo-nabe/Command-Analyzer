@@ -8,8 +8,10 @@
 
 package jp.udonabe.commandanalyzer.option;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
 /**
  * コマンドのオプションを表すクラス。
@@ -20,6 +22,8 @@ import lombok.NonNull;
  */
 
 @Getter
+@EqualsAndHashCode
+@ToString
 public class Option {
     /**
      * オプションの接頭辞。空にすることもできます。
