@@ -3,10 +3,10 @@
 
 ## 機能 / Function
 予定です。
-・- --などLinuxタイプのオプション
-・/などWindowsタイプのオプション
-・プレフィックスがないサブコマンド
-・ヘルプの自動出力 / 
+- -(ハイフン)などLinuxタイプのオプション
+- /などWindowsタイプのオプション
+- プレフィックスがないサブコマンド
+- ヘルプの自動出力 / 
 Function
 Planned.
 - Linux-type options such as -- and -
