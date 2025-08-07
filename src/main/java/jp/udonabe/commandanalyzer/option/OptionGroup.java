@@ -16,9 +16,10 @@ import java.util.List;
  * オプションのグループを表す。
  *
  * @param options グループに所属しているオプション。
+ * @param name 管理名。
  */
-public record OptionGroup(List<Option> options) {
-    public OptionGroup(@NonNull Option... options) {
-        this(List.of(options));
+public record OptionGroup(String name, List<Option> options) {
+    public OptionGroup(String name, @NonNull Option... options) {
+        this(name, List.of(options));
     }
 }
