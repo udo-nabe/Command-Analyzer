@@ -15,13 +15,11 @@ import lombok.NonNull;
  */
 public class OnlyValueOption extends Option {
     /**
-     * コンストラクタ。requiredをfalseにすると、紛らわしくなってしまうため、
-     * trueにすることを推奨します。
-     * @param name
-     * @param argType
-     * @param required
+     * コンストラクタ。
+     * @param name 管理名。
+     * @param argType 引数の種別。
      */
-    public OnlyValueOption(@NonNull String name, @NonNull ArgType argType, boolean required) {
-        super("", name, "", argType, required);
+    public OnlyValueOption(@NonNull String name, @NonNull ArgType argType) {
+        super("", name, "", argType);
     }
 }

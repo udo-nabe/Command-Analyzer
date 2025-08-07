@@ -13,7 +13,7 @@ package jp.udonabe.commandanalyzer.option;
  * このオプションは、まとめることができません。
  */
 public class LongOption extends Option {
-    public LongOption(String name, String displayName, ArgType type, boolean required) {
-        super("--", name, displayName, type, required);
+    public LongOption(String name, String displayName, ArgType type) {
+        super("--", name, displayName, type);
     }
 }

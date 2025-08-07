@@ -19,9 +19,8 @@ public class OnlyDisplayOption extends Option {
      * argTypeは自動的にNONEになります。
      * @param name 管理名。
      * @param displayName 表示名。
-     * @param required 必須かどうか。
      */
-    public OnlyDisplayOption(@NonNull String name, String displayName, boolean required) {
-        super("", name, displayName, ArgType.NONE, required);
+    public OnlyDisplayOption(@NonNull String name, String displayName) {
+        super("", name, displayName, ArgType.NONE);
     }
 }

@@ -27,7 +27,6 @@ import lombok.ToString;
 public class Option {
     /**
      * オプションの接頭辞。空にすることもできます。
-     * 空にした場合は、{@link #required}をtrueに設定することを推奨します。
      * 注意: このクラスを直接インスタンス化しても、子クラス特有の機能(ショートオプションをまとめられるなど)は付与されません。
      */
     private final String prefix;
@@ -46,20 +45,14 @@ public class Option {
      * 引数の種別。詳細は{@link ArgType}をご覧ください。
      */
     private final ArgType argType;
-    /**
-     * このオプションが必須かどうか。
-     * 必須オプションの場合は、コマンドの解析時にこのオプションが無いとエラーになります。
-     */
-    private final boolean required;
 
     /**
      * 標準のコンストラクタ。
      * @param prefix 接頭辞。({@link #prefix})
      * @param name オプションの名前。({@link #name})
      * @param argType 引数の種別。({@link #argType})
-     * @param required 必須かどうか。({@link #required})
      */
-    public Option(@NonNull String prefix, @NonNull String name, String displayName, @NonNull ArgType argType, boolean required) {
+    public Option(@NonNull String prefix, @NonNull String name, String displayName, @NonNull ArgType argType) {
         //引数のチェック
         if (displayName == null || displayName.isEmpty()) {
             if (argType == ArgType.NONE) {
@@ -74,7 +67,6 @@ public class Option {
         this.name = name;
         this.displayName = displayName;
         this.argType = argType;
-        this.required = required;
     }
 
     /**
