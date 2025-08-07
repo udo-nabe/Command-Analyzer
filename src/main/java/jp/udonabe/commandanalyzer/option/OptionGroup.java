@@ -17,10 +17,12 @@ import java.util.List;
  *
  * @param options グループに所属しているオプション。
  * @param name 管理名。
+ * @param kind グループの種別。
+ * @param required 必須かどうか。
  */
-public record OptionGroup(String name, Kind kind, List<Option> options) {
-    public OptionGroup(String name, Kind kind, @NonNull Option... options) {
-        this(name, kind, List.of(options));
+public record OptionGroup(String name, Kind kind, boolean required, List<Option> options) {
+    public OptionGroup(String name, Kind kind, boolean required, @NonNull Option... options) {
+        this(name, kind, required, List.of(options));
     }
 
     public enum Kind {
