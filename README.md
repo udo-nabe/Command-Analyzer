@@ -1,6 +1,19 @@
 # Command-Analyzer
 コマンドの基本的なオプション解析を、軽量に行うライブラリ。/ A lightweight library for parsing basic command options.
 
+## 機能 / Function
+予定です。
+・- --などLinuxタイプのオプション
+・/などWindowsタイプのオプション
+・プレフィックスがないサブコマンド
+・ヘルプの自動出力 / 
+Function
+Planned.
+- Linux-type options such as -- and -
+- Windows-type options such as /
+- Subcommands without prefixes
+- Automatic help output
+
 ## 使用方法 / How to use
 現在、仕様を考えていますので、少々お待ちください。 / We are currently considering the specifications, so please wait a little while.
 
