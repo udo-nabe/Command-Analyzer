@@ -19,13 +19,10 @@ public class OptionTest {
     @Test
     void instantiate() {
         //正常系:正しくインスタンス化できるか
-        Option option = new Option("-", "e", "example", Option.ArgType.NONE);
+        Option option = new Option("-", "example", Option.ArgType.NONE);
 
         //接頭辞の確認
         assertEquals("-", option.getPrefix());
-
-        //オプション名の確認
-        assertEquals("e", option.getName());
 
         //引数タイプの確認
         assertEquals(Option.ArgType.NONE, option.getArgType());
@@ -34,7 +31,6 @@ public class OptionTest {
         assertEquals("example", option.getDisplayName());
 
         //異常系:引数に誤りがある場合、正しく例外を送出するか
-        assertThrows(IllegalArgumentException.class, () -> new Option("-", "", "aaa", Option.ArgType.NONE));
-        assertThrows(IllegalArgumentException.class, () -> new Option("-", "aaa", "", Option.ArgType.NONE));
+        assertThrows(IllegalArgumentException.class, () -> new Option("-", "", Option.ArgType.NONE));
     }
 }

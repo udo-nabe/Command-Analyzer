@@ -16,10 +16,9 @@ import lombok.NonNull;
 public class OnlyValueOption extends Option {
     /**
      * コンストラクタ。
-     * @param name 管理名。
      * @param argType 引数の種別。
      */
-    public OnlyValueOption(@NonNull String name, @NonNull ArgType argType) {
-        super("", name, "", argType);
+    public OnlyValueOption(@NonNull ArgType argType) {
+        super("", "", argType);
     }
 }

@@ -31,11 +31,6 @@ public class Option {
      */
     private final String prefix;
     /**
-     * オプションの名前。
-     * 名前は空にすることができません。
-     */
-    private final String name;
-    /**
      * オプションの表示名。
      * 表示名は空にすることができます。
      * 空にした場合、ArgTypeをNONEに設定することはできません。
@@ -49,22 +44,17 @@ public class Option {
     /**
      * 標準のコンストラクタ。
      * @param prefix 接頭辞。({@link #prefix})
-     * @param name オプションの名前。({@link #name})
      * @param argType 引数の種別。({@link #argType})
      */
-    public Option(@NonNull String prefix, @NonNull String name, String displayName, @NonNull ArgType argType) {
+    public Option(@NonNull String prefix, String displayName, @NonNull ArgType argType) {
         //引数のチェック
         if (displayName == null || displayName.isEmpty()) {
             if (argType == ArgType.NONE) {
                 throw new IllegalArgumentException("If displayName is null or empty, ArgType cannot be NONE.");
             }
         }
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("The argument 'name' cannot be empty.");
-        }
 
         this.prefix = prefix;
-        this.name = name;
         this.displayName = displayName;
         this.argType = argType;
     }

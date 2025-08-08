@@ -17,10 +17,9 @@ public class OnlyDisplayOption extends Option {
     /**
      * コンストラクタ。
      * argTypeは自動的にNONEになります。
-     * @param name 管理名。
      * @param displayName 表示名。
      */
-    public OnlyDisplayOption(@NonNull String name, String displayName) {
-        super("", name, displayName, ArgType.NONE);
+    public OnlyDisplayOption(String displayName) {
+        super("", displayName, ArgType.NONE);
     }
 }
