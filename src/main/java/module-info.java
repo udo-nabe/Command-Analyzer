@@ -3,4 +3,5 @@ module jp.udonabe.command.analyzer {
 
     exports jp.udonabe.commandanalyzer.option;
     exports jp.udonabe.commandanalyzer.commnad;
+    exports jp.udonabe.commandanalyzer;
 }
