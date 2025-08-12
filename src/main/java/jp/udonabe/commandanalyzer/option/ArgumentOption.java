@@ -11,15 +11,14 @@ package jp.udonabe.commandanalyzer.option;
 import lombok.NonNull;
 
 /**
- * 表示のみで、接頭辞もなく、値も受け取らないオプション。
+ * 値のみが入力されるオプション。
  */
-public class OnlyDisplayOption extends Option {
+public class ArgumentOption extends Option {
     /**
      * コンストラクタ。
-     * argTypeは自動的にNONEになります。
-     * @param displayName 表示名。
+     * @param argType 引数の種別。
      */
-    public OnlyDisplayOption(String displayName) {
-        super("", displayName, ArgType.NONE);
+    public ArgumentOption(@NonNull ArgType argType) {
+        super("", "", argType);
     }
 }
