@@ -124,4 +124,21 @@ public class CommandOptionsTest {
                             new LongOption("a", Option.ArgType.STRING));
         });
     }
+
+
+    @Test
+    void duplicate() {
+        //OptionGroupのnameが重複した場合、エラーを出すか
+        assertThrows(IllegalArgumentException.class, () -> {
+            new CommandOptions.Builder()
+                    .option("test", false, new ShortOption("duplicate", Option.ArgType.NONE))
+                    .option("test", false, new ShortOption("test", Option.ArgType.NONE));
+        });
+        //OptionのdisplayNameが重複した場合、エラーを出すか
+        assertThrows(IllegalArgumentException.class, () -> {
+            new CommandOptions.Builder()
+                    .option("test", false, new ShortOption("duplicate", Option.ArgType.NONE))
+                    .option("test1", false, new ShortOption("duplicate", Option.ArgType.NONE));
+        });
+    }
 }

@@ -14,6 +14,7 @@ import jp.udonabe.commandanalyzer.option.Option;
 import jp.udonabe.commandanalyzer.option.OptionGroup;
 import jp.udonabe.commandanalyzer.parser.Parser;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -54,6 +55,7 @@ public class CommandOptions {
          */
         public Builder option(String name, boolean required, Option opt) {
             checkNonAdded(name);
+            checkOptionNonAdded(opt.getDisplayName());
             groups.add(new OptionGroup(name, OptionGroup.Kind.WRAP, required, opt));
             return this;
         }
@@ -64,10 +66,13 @@ public class CommandOptions {
          * @param options 追加するOption。全てのインスタンスで、displayNameとprefix以外の属性が同じである必要があります。
          * @return 自分自身。
          */
-        public Builder equal(String name, boolean required, Option... options) {
+        public Builder equal(String name, boolean required, @NonNull Option... options) {
             checkNonAdded(name);
-            //optionsがnullまたは空ならばエラーを出す
-            if (options == null || options.length == 0) {
+            for (Option o : options) {
+                checkOptionNonAdded(o.getDisplayName());
+            }
+            //optionsが空ならばエラーを出す
+            if (options.length == 0) {
                 throw new IllegalArgumentException("The argument 'options' cannot be null or empty.");
             }
             //displayNameとprefix以外が等価か判定する
@@ -87,10 +92,13 @@ public class CommandOptions {
          * @param options 追加するオプション。nameとdisplayNameは異なる必要がある。
          * @return 自分自身。
          */
-        public Builder which(String name, boolean required, Option... options) {
+        public Builder which(String name, boolean required, @NonNull Option... options) {
             checkNonAdded(name);
-            //optionsがnullまたは空ならばエラーを出す
-            if (options == null || options.length == 0) {
+            for (Option o : options) {
+                checkOptionNonAdded(o.getDisplayName());
+            }
+            //optionsが空ならばエラーを出す
+            if (options.length == 0) {
                 throw new IllegalArgumentException("The argument 'options' cannot be null or empty.");
             }
             //nameかdisplayNameが一つでも重複した場合、エラーを出す。
@@ -118,6 +126,14 @@ public class CommandOptions {
             if (groups.stream()
                     .anyMatch(t -> t.name().equals(name))) {
                 throw new IllegalArgumentException("All groups are must have unique field 'name'.");
+            }
+        }
+
+        private void checkOptionNonAdded(String name) {
+            if (groups.stream()
+                    .anyMatch(t -> t.options().stream()
+                            .anyMatch(t1 -> t1.getDisplayName().equals(name)))) {
+                throw new IllegalArgumentException("All options are must have unique field 'name'.");
             }
         }
     }
