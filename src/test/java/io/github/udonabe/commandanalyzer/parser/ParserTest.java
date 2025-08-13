@@ -11,7 +11,7 @@ package io.github.udonabe.commandanalyzer.parser;
 import io.github.udonabe.commandanalyzer.OptionParseException;
 import io.github.udonabe.commandanalyzer.ParseResult;
 import io.github.udonabe.commandanalyzer.commnad.CommandOptions;
-import com.github.udonabe.commandanalyzer.option.*;
+import io.github.udonabe.commandanalyzer.option.*;
 import io.github.udonabe.commandanalyzer.option.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
