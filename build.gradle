@@ -8,15 +8,57 @@
 
 plugins {
     id 'java-library'
-    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.2'
-}
-
-repositories {
-    mavenCentral()
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.2' //Please Comment Out
+    id 'com.vanniktech.maven.publish' version '0.34.0' //Please Comment Out
 }
 
 version = '1.0.1'
 group = 'io.github.udo-nabe'
+
+//Please Comment Out: Begin
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+
+    coordinates(
+            project.group,
+            project.rootProject.name,
+            project.version
+    )
+
+    pom {
+        name = project.rootProject.name
+        description = 'A lightweight library for parsing basic command options.'
+        inceptionYear = '2025'
+        url = 'https://github.com/udo-nabe/Command-Analyzer'
+        licenses {
+            license {
+                name = 'MIT License'
+                url = 'https://github.com/udo-nabe/Command-Analyzer/blob/main/LICENSE'
+                distribution = 'https://github.com/udo-nabe/Command-Analyzer/blob/main/LICENSE'
+            }
+        }
+
+        developers {
+            developer {
+                id = 'udo-nabe'
+                name = 'Udo-Nabe'
+                url = 'https://github.com/udo-nabe'
+            }
+        }
+
+        scm {
+            connection = 'scm:git:https://github.com/udo-nabe/${project.rootProject.name}.git'
+            developerConnection = 'scm:git:git@github.com:udo-nabe/${project.rootProject.name}.git'
+            url = 'https://github.com/udo-nabe/Command-Analyzer'
+        }
+    }
+}
+//Please Comment Out: End
+
+repositories {
+    mavenCentral()
+}
 
 java {
     toolchain {
