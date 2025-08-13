@@ -10,8 +10,10 @@ package jp.udonabe.commandanalyzer.commnad;
 
 import jp.udonabe.commandanalyzer.OptionParseException;
 import jp.udonabe.commandanalyzer.ParseResult;
+import jp.udonabe.commandanalyzer.option.ArgumentOption;
 import jp.udonabe.commandanalyzer.option.Option;
 import jp.udonabe.commandanalyzer.option.OptionGroup;
+import jp.udonabe.commandanalyzer.option.SubCommandOption;
 import jp.udonabe.commandanalyzer.parser.Parser;
 import lombok.Getter;
 import lombok.NonNull;
@@ -110,6 +112,40 @@ public class CommandOptions {
             }
 
             groups.add(new OptionGroup(name, OptionGroup.Kind.WHICH, required, options));
+            return this;
+        }
+
+        public Builder subCommand(@NonNull String name, @NonNull String... subCommands) {
+            checkNonAdded(name);
+            for (String s : subCommands) {
+                checkOptionNonAdded(s);
+            }
+
+            if (subCommands.length == 0) {
+                throw new IllegalArgumentException("The argument 'subCommands' cannot be null or empty.");
+            }
+
+            //一つでも重複した場合、エラーを出す。
+            Set<String> displaySeen = new HashSet<>();
+
+            if (Arrays.stream(subCommands)
+                    .anyMatch(d -> !displaySeen.add(d))) {
+                throw new IllegalArgumentException("All strings must be unique.");
+            }
+
+            List<Option> opts = new ArrayList<>();
+            for (String s : subCommands) {
+                opts.add(new SubCommandOption(s));
+            }
+            groups.add(new OptionGroup(name, OptionGroup.Kind.SUBCOMMAND, true, opts));
+            return this;
+        }
+
+        public Builder argument(@NonNull String name, @NonNull Option.ArgType type) {
+            checkNonAdded(name);
+            checkOptionNonAdded(name);
+
+            groups.add(new OptionGroup(name, OptionGroup.Kind.SUBCOMMAND, true, new ArgumentOption(type)));
             return this;
         }
 

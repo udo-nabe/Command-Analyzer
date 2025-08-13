@@ -29,5 +29,7 @@ public record OptionGroup(String name, Kind kind, boolean required, List<Option>
         WRAP,
         EQUAL,
         WHICH,
+        SUBCOMMAND,
+        ARGUMENT,
     }
 }

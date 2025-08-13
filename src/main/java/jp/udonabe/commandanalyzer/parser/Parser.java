@@ -13,10 +13,7 @@ import jp.udonabe.commandanalyzer.ParseResult;
 import jp.udonabe.commandanalyzer.option.Option;
 import jp.udonabe.commandanalyzer.option.OptionGroup;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static jp.udonabe.commandanalyzer.option.Option.ArgType.NONE;
 
@@ -36,34 +33,81 @@ public final class Parser {
      */
     public static Map<String, ParseResult> parse(List<OptionGroup> groups, String[] targets) throws OptionParseException {
         Map<String, ParseResult> result = new HashMap<>();
+        Set<String> names = new HashSet<>();
+        for (OptionGroup group : groups) {
+            for (Option opt : group.options()) {
+                names.add(opt.getDisplayName());
+            }
+        }
+
+        //targetsの重複を調べる
+        Set<String> seen = new HashSet<>();
+        for (String s : targets) {
+            if (!seen.add(s)) {
+                throw new OptionParseException("Duplicate option detected.");
+            }
+        }
+
         for (OptionGroup group : groups) {
             switch (group.kind()) {
-                case WRAP -> searchAndPut(group.name(), group.required(), targets, result, group.options().getFirst(), OptionGroup.Kind.WRAP);
+                case WRAP ->
+                        searchAndPut(group.name(), group.required(), targets, result, group.options().getFirst(), OptionGroup.Kind.WRAP, names);
                 case EQUAL -> {
                     for (Option option : group.options()) {
-                        boolean isBreak = searchAndPut(group.name(), false, targets, result, option, OptionGroup.Kind.EQUAL);
+                        boolean isBreak = searchAndPut(group.name(), false, targets, result, option, OptionGroup.Kind.EQUAL, names);
                         if (isBreak) break;
                     }
                 }
                 case WHICH -> {
-                    String matchedName = "";
+                    String matchedName = null;
                     for (Option option : group.options()) {
-                        boolean isBreak = searchAndPut(group.name(), false, targets, result, option, OptionGroup.Kind.WHICH);
-                        if (isBreak){
+                        boolean isBreak = searchAndPut(group.name(), false, targets, result, option, OptionGroup.Kind.WHICH, names);
+                        if (isBreak) {
+                            if (matchedName != null) {
+                                throw new OptionParseException("Conflict which option: " + matchedName + " and " + option.getDisplayName() + ".");
+                            }
                             matchedName = option.getDisplayName();
-                            break;
                         }
                     }
                     result.put(group.name(), ParseResult.builder()
                             .rWhich(matchedName)
                             .build());
                 }
+
+                //SubCommandの場合は、無条件でrequiredがtrueとみなす。
+                case SUBCOMMAND -> {
+                    int commandIndex = groups.indexOf(group);
+                    Optional<Option> match = group.options().stream()
+                            .filter(t -> t.getDisplayName().equals(targets[commandIndex]))
+                            .findFirst();
+                    if (match.isEmpty())
+                        throw new OptionParseException("SubCommand Group \"" + group.name() + "\" not found.");
+                    result.put(group.name(), ParseResult.builder()
+                            .rSubCommand(match.get().getDisplayName())
+                            .build());
+                }
+
+                case ARGUMENT -> {
+                    int commandIndex = groups.indexOf(group);
+                    //Optional<Option> match = Optional.empty();
+                    try {
+                        put(group.options().getFirst(), result, commandIndex, targets[commandIndex], group.name());
+                    } catch (OptionParseException e) {
+                        throw new OptionParseException("Argument Group \"" + group.name() + "\" not found or invalid.");
+                    }
+//                    if (match.isEmpty())
+//                        throw new OptionParseException("Argument Group \"" + group.name() + "\" not found.");
+//                    result.put(group.name(), ParseResult.builder()
+//                            .rSubCommand(match.get().getDisplayName())
+//                            .build());
+                }
             }
         }
+
         return result;
     }
 
-    private static boolean searchAndPut(String groupName, boolean isRequired, String[] targets, Map<String, ParseResult> result, Option opt, OptionGroup.Kind kind) throws OptionParseException {
+    private static boolean searchAndPut(String groupName, boolean isRequired, String[] targets, Map<String, ParseResult> result, Option opt, OptionGroup.Kind kind, Set<String> names) throws OptionParseException {
         //インデックスを探す必要があるため、あえてStream APIではなく、forループを使う。
         int matchIndex = -1;
         String value = null;
@@ -81,13 +125,24 @@ public final class Parser {
                 continue;
             }
 
+            if (!names.contains(del)) {
+                throw new OptionParseException("Unknown option: " + str);
+            }
+
             if (opt.getDisplayName().equals(del)) {
-                if (opt.getArgType() != NONE && i <= targets.length - 1) {
+                if (opt.getArgType() != NONE && i < targets.length - 1) {
                     value = targets[i + 1];
                     matchIndex = i;
-                    System.out.println("Matched! display=" + opt.getDisplayName() + " name=" + groupName + " value=" + value);
                     break;
                 } else if (opt.getArgType() == NONE) {
+                    //不要な引数がある場合、エラーを出すようにする。
+                    if (i < targets.length - 1) {
+                        String arg = targets[i + 1];
+
+                        if (!arg.matches("(-|--).*")) {
+                            throw new OptionParseException("Option " + opt.getPrefix() + opt.getDisplayName() + " does not accept arguments");
+                        }
+                    }
                     matchIndex = i;
                 } else {
                     throw new OptionParseException("Option argument not found. groupName=\"" + groupName + "\" argType=" + opt.getArgType());
@@ -106,7 +161,11 @@ public final class Parser {
             }
         }
 
-        //ここからはOptionの種別によって処理が変わる
+        put(opt, result, matchIndex, value, groupName);
+        return true;
+    }
+
+    private static void put(Option opt, Map<String, ParseResult> result, int matchIndex, String value, String groupName) throws OptionParseException {
         switch (opt.getArgType()) {
             case NONE -> putNone(result, matchIndex != -1, groupName);
             case INTEGER -> putInteger(result, value, groupName);
@@ -114,7 +173,6 @@ public final class Parser {
             case DOUBLE -> putDouble(result, value, groupName);
             case BOOLEAN -> putBoolean(result, value, groupName);
         }
-        return true;
     }
 
     private static void putNone(Map<String, ParseResult> res, boolean val, String groupName) {
@@ -129,7 +187,7 @@ public final class Parser {
                     .rInt(Integer.parseInt(value))
                     .build());
         } else {
-            throw new OptionParseException("Invalid option argument: " + value + " groupName=" + groupName);
+            throw new OptionParseException("The type is different: " + value + " groupName=" + groupName);
         }
     }
 
@@ -139,7 +197,7 @@ public final class Parser {
                     .rString(value)
                     .build());
         } else {
-            throw new OptionParseException("Invalid option argument: " + value);
+            throw new OptionParseException("The type is different: " + value + " groupName=" + groupName);
         }
     }
 
@@ -149,7 +207,7 @@ public final class Parser {
                     .rDouble(Double.parseDouble(value))
                     .build());
         } else {
-            throw new OptionParseException("Invalid option argument: " + value);
+            throw new OptionParseException("The type is different: " + value + " groupName=" + groupName);
         }
     }
 
@@ -159,7 +217,7 @@ public final class Parser {
                     .rBoolean(Boolean.parseBoolean(value))
                     .build());
         } else {
-            throw new OptionParseException("Invalid option argument: " + value);
+            throw new OptionParseException("The type is different: " + value + " groupName=" + groupName);
         }
     }
 }
