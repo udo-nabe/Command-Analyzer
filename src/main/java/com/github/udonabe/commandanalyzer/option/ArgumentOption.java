@@ -6,7 +6,7 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.option;
+package com.github.udonabe.commandanalyzer.option;
 
 import lombok.NonNull;
 

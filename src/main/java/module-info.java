@@ -1,7 +1,7 @@
-module jp.udonabe.command.analyzer {
+module com.github.udonabe.command.analyzer {
     requires lombok;
 
-    exports jp.udonabe.commandanalyzer.option;
-    exports jp.udonabe.commandanalyzer.commnad;
-    exports jp.udonabe.commandanalyzer;
+    exports com.github.udonabe.commandanalyzer.option;
+    exports com.github.udonabe.commandanalyzer.commnad;
+    exports com.github.udonabe.commandanalyzer;
 }

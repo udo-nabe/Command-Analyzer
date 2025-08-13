@@ -6,14 +6,13 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.command;
+package com.github.udonabe.commandanalyzer.command;
 
-import jp.udonabe.commandanalyzer.ParseResult;
-import jp.udonabe.commandanalyzer.commnad.CommandOptions;
-import jp.udonabe.commandanalyzer.option.LongOption;
-import jp.udonabe.commandanalyzer.option.Option;
-import jp.udonabe.commandanalyzer.option.OptionGroup;
-import jp.udonabe.commandanalyzer.option.ShortOption;
+import com.github.udonabe.commandanalyzer.commnad.CommandOptions;
+import com.github.udonabe.commandanalyzer.option.LongOption;
+import com.github.udonabe.commandanalyzer.option.Option;
+import com.github.udonabe.commandanalyzer.option.OptionGroup;
+import com.github.udonabe.commandanalyzer.option.ShortOption;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;

@@ -6,17 +6,16 @@
  *
  */
 
-package jp.udonabe.commandanalyzer;
+package com.github.udonabe.commandanalyzer;
 
-import jp.udonabe.commandanalyzer.commnad.CommandOptions;
-import jp.udonabe.commandanalyzer.option.LongOption;
-import jp.udonabe.commandanalyzer.option.Option;
-import jp.udonabe.commandanalyzer.option.ShortOption;
+import com.github.udonabe.commandanalyzer.OptionParseException;
+import com.github.udonabe.commandanalyzer.commnad.CommandOptions;
+import com.github.udonabe.commandanalyzer.option.LongOption;
+import com.github.udonabe.commandanalyzer.option.Option;
+import com.github.udonabe.commandanalyzer.option.ShortOption;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.Map;
 
 /**
  * ライブラリ全体のテストを行う。

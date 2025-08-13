@@ -6,7 +6,7 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.option;
+package com.github.udonabe.commandanalyzer.option;
 
 /**
  * 表示のみで、接頭辞もなく、値も受け取らないオプション。

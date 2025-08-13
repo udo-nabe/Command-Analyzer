@@ -6,7 +6,8 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.option;
+package com.github.udonabe.commandanalyzer.option;
+import com.github.udonabe.commandanalyzer.option.Option;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

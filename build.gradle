@@ -16,7 +16,7 @@ repositories {
 }
 
 version = '1.0.1'
-group = 'jp.udonabe'
+group = 'com.github.udo-nabe'
 
 java {
     toolchain {
