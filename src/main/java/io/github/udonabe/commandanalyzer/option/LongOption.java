@@ -6,7 +6,7 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.option;
+package io.github.udonabe.commandanalyzer.option;
 /**
  * 長いタイプのコマンドのオプションを表すクラス。
  * このクラスは、「--」が接頭辞にあるオプションを表します。

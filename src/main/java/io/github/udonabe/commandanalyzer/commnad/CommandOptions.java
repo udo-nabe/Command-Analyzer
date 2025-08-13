@@ -6,20 +6,19 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.commnad;
+package io.github.udonabe.commandanalyzer.commnad;
 
-import jp.udonabe.commandanalyzer.OptionParseException;
-import jp.udonabe.commandanalyzer.ParseResult;
-import jp.udonabe.commandanalyzer.option.ArgumentOption;
-import jp.udonabe.commandanalyzer.option.Option;
-import jp.udonabe.commandanalyzer.option.OptionGroup;
-import jp.udonabe.commandanalyzer.option.SubCommandOption;
-import jp.udonabe.commandanalyzer.parser.Parser;
+import io.github.udonabe.commandanalyzer.OptionParseException;
+import io.github.udonabe.commandanalyzer.ParseResult;
+import io.github.udonabe.commandanalyzer.option.ArgumentOption;
+import io.github.udonabe.commandanalyzer.option.Option;
+import io.github.udonabe.commandanalyzer.option.OptionGroup;
+import io.github.udonabe.commandanalyzer.option.SubCommandOption;
+import io.github.udonabe.commandanalyzer.parser.Parser;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * コマンドのオプションをまとめるクラス。

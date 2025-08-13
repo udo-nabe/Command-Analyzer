@@ -6,7 +6,7 @@
  *
  */
 
-package jp.udonabe.commandanalyzer;
+package io.github.udonabe.commandanalyzer;
 
 /**
  * 当てはまるOptionが見つからなかったことを表す例外。

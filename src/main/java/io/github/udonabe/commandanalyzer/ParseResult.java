@@ -6,7 +6,7 @@
  *
  */
 
-package jp.udonabe.commandanalyzer;
+package io.github.udonabe.commandanalyzer;
 
 import lombok.Builder;
 

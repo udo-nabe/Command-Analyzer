@@ -6,12 +6,13 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.parser;
+package io.github.udonabe.commandanalyzer.parser;
 
-import jp.udonabe.commandanalyzer.OptionParseException;
-import jp.udonabe.commandanalyzer.ParseResult;
-import jp.udonabe.commandanalyzer.commnad.CommandOptions;
-import jp.udonabe.commandanalyzer.option.*;
+import io.github.udonabe.commandanalyzer.OptionParseException;
+import io.github.udonabe.commandanalyzer.ParseResult;
+import io.github.udonabe.commandanalyzer.commnad.CommandOptions;
+import com.github.udonabe.commandanalyzer.option.*;
+import io.github.udonabe.commandanalyzer.option.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

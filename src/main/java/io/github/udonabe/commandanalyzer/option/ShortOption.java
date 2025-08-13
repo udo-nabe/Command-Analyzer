@@ -6,7 +6,7 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.option;
+package io.github.udonabe.commandanalyzer.option;
 
 /**
  * 短いタイプのコマンドのオプションを表すクラス。

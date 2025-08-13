@@ -6,7 +6,7 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.option;
+package io.github.udonabe.commandanalyzer.option;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

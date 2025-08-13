@@ -6,16 +6,16 @@
  *
  */
 
-package jp.udonabe.commandanalyzer.parser;
+package io.github.udonabe.commandanalyzer.parser;
 
-import jp.udonabe.commandanalyzer.OptionParseException;
-import jp.udonabe.commandanalyzer.ParseResult;
-import jp.udonabe.commandanalyzer.option.Option;
-import jp.udonabe.commandanalyzer.option.OptionGroup;
+import io.github.udonabe.commandanalyzer.OptionParseException;
+import io.github.udonabe.commandanalyzer.ParseResult;
+import io.github.udonabe.commandanalyzer.option.Option;
+import io.github.udonabe.commandanalyzer.option.OptionGroup;
 
 import java.util.*;
 
-import static jp.udonabe.commandanalyzer.option.Option.ArgType.NONE;
+import static io.github.udonabe.commandanalyzer.option.Option.ArgType.NONE;
 
 /**
  * コマンドオプションをパースする。
