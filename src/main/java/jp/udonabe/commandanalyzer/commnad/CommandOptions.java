@@ -145,7 +145,7 @@ public class CommandOptions {
             checkNonAdded(name);
             checkOptionNonAdded(name);
 
-            groups.add(new OptionGroup(name, OptionGroup.Kind.SUBCOMMAND, true, new ArgumentOption(type)));
+            groups.add(new OptionGroup(name, OptionGroup.Kind.ARGUMENT, true, new ArgumentOption(type)));
             return this;
         }
 
