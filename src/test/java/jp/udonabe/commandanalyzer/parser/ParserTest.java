@@ -15,6 +15,7 @@ import jp.udonabe.commandanalyzer.option.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -319,5 +320,19 @@ public class ParserTest {
                             new ArgumentOption(Option.ArgType.INTEGER))
             ), new String[]{""});
         });
+    }
+
+    @Test
+    void notFound() throws OptionParseException {
+        //想定していたオプション(required=false)が無い場合の挙動
+        Map<String, ParseResult> res =  Parser.parse(List.of(
+                new OptionGroup("test", OptionGroup.Kind.WRAP, false,
+                        new ShortOption("t", Option.ArgType.STRING))
+        ), new String[]{""});
+        assertEquals(new HashMap<String, ParseResult>() {
+            {
+                put("test", new ParseResult(0, false, 0.0, null, null, null));
+            }
+        }, res);
     }
 }

@@ -155,8 +155,10 @@ public final class Parser {
             if (kind == OptionGroup.Kind.WRAP) {
                 if (opt.getArgType() != NONE) {
                     result.put(groupName, ParseResult.builder().build());
+                    return false;
                 }
             } else if (kind == OptionGroup.Kind.EQUAL || kind == OptionGroup.Kind.WHICH) {
+                result.put(groupName, ParseResult.builder().build());
                 return false;
             }
         }
