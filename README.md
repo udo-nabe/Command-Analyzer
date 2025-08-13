@@ -4,19 +4,17 @@
 
 
 ## 機能 / Function
-予定です。
+バージョン1.0.0現在です。
 - -(ハイフン)などLinuxタイプのオプション
-- /などWindowsタイプのオプション
 - プレフィックスがないサブコマンド
-- ヘルプの自動出力 <br/>
-Planned.
+- 引数機能 <br>
+  On version 1.0.0
 - Linux-type options such as -- and -
-- Windows-type options such as /
 - Subcommands without prefixes
-- Automatic help output
+- Argument function
 
 ## 使用方法 / How to use
-現在、仕様を考えていますので、少々お待ちください。 / We are currently considering the specifications, so please wait a little while.
+
 
 ## 開発者募集中! / We're hiring developers!
 このプロジェクトに貢献してくださる方は、yu_w_main@yahoo.co.jpまでご連絡お願いします。 / If you would like to contribute to this project, please contact yu_w_main@yahoo.co.jp.
