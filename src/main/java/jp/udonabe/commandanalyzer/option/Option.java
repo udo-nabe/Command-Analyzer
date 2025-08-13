@@ -49,8 +49,16 @@ public class Option {
     public Option(@NonNull String prefix, String displayName, @NonNull ArgType argType) {
         //引数のチェック
         if (displayName == null || displayName.isEmpty()) {
-            if (argType == ArgType.NONE) {
-                throw new IllegalArgumentException("If displayName is null or empty, ArgType cannot be NONE.");
+            if (!(this instanceof SubCommandOption || this instanceof ArgumentOption)) {
+                throw new IllegalArgumentException("Argument displayName cannot be null or empty");
+            }
+        }
+        if (displayName != null) {
+            if (!(prefix.equals("-") || prefix.equals("--") || prefix.isEmpty())) {
+                throw new IllegalArgumentException("Argument prefix must be \"-\" or \"--\" or empty.");
+            }
+            if (displayName.startsWith("-") || displayName.startsWith("--")) {
+                throw new IllegalArgumentException("Argument displayName cannot be \"-\" or \"--\"");
             }
         }
 
