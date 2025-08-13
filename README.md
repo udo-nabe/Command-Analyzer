@@ -14,7 +14,7 @@
 - Argument function
 
 ## 使用方法 / How to use
-
+Wikiを参照してください。 / See Wiki.
 
 ## 開発者募集中! / We're hiring developers!
 このプロジェクトに貢献してくださる方は、yu_w_main@yahoo.co.jpまでご連絡お願いします。 / If you would like to contribute to this project, please contact yu_w_main@yahoo.co.jp.
