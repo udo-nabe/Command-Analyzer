@@ -12,7 +12,7 @@ plugins {
     id 'com.vanniktech.maven.publish' version '0.34.0' //Please Comment Out
 }
 
-version = '1.0.1'
+version = '1.0.2'
 group = 'io.github.udo-nabe'
 
 //Please Comment Out: Begin
@@ -35,7 +35,7 @@ mavenPublishing {
             license {
                 name = 'MIT License'
                 url = 'https://github.com/udo-nabe/Command-Analyzer/blob/main/LICENSE'
-                distribution = 'https://github.com/udo-nabe/Command-Analyzer/blob/main/LICENSE'
+                distribution = 'repo'
             }
         }
 
@@ -48,8 +48,8 @@ mavenPublishing {
         }
 
         scm {
-            connection = 'scm:git:https://github.com/udo-nabe/${project.rootProject.name}.git'
-            developerConnection = 'scm:git:git@github.com:udo-nabe/${project.rootProject.name}.git'
+            connection = 'scm:git:https://github.com/udo-nabe/Command-Analyzer.git'
+            developerConnection = 'scm:git:git@github.com:udo-nabe/Command-Analyzer.git'
             url = 'https://github.com/udo-nabe/Command-Analyzer'
         }
     }
@@ -72,7 +72,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    implementation 'org.projectlombok:lombok:1.18.38'
+    compileOnly 'org.projectlombok:lombok:1.18.38'
     annotationProcessor 'org.projectlombok:lombok:1.18.38'
 }
 
