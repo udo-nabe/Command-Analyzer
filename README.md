@@ -1,14 +1,14 @@
 # Command-Analyzer
 コマンドの基本的なオプション解析を、軽量に行うライブラリ。/ A lightweight library for parsing basic command options. <br>
-現在開発中ですが、手軽にオプション解析をしたいという方は、ぜひ応援をお願いします!
+手軽にオプション解析をしたいという方は、ぜひ応援をお願いします!
 
 
 ## 機能 / Function
-バージョン1.0.0現在です。
+バージョン1.0.2現在です。
 - -(ハイフン)などLinuxタイプのオプション
 - プレフィックスがないサブコマンド
 - 引数機能 <br>
-  On version 1.0.0
+  On version 1.0.2
 - Linux-type options such as -- and -
 - Subcommands without prefixes
 - Argument function
