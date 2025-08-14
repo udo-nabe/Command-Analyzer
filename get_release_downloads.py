@@ -20,12 +20,16 @@ response = requests.get(url, headers=headers).json()
 # 現在時刻
 now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 
+# 最新バージョン(人間が追加)
+LATEST_VERSION = "1.0.2"
+
 # CSVに書き込むデータ
 rows = []
 for release in response:
     release_name = release["name"]
     for asset in release["assets"]:
-        rows.append([now, release_name, asset["name"], asset["download_count"]])
+        if LATEST_VERSION in asset["name"]:
+            rows.append([now, release_name, asset["name"], asset["download_count"]])
 
 # CSVが存在しない場合はヘッダ付きで作成
 file_exists = os.path.isfile(CSV_PATH)
