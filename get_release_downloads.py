@@ -28,8 +28,8 @@ rows = []
 for release in response:
     release_name = release["name"]
     for asset in release["assets"]:
-        if LATEST_VERSION in asset["name"] 
-        rows.append([now, release_name, asset["name"], asset["download_count"]])
+        if LATEST_VERSION in asset["name"]:
+            rows.append([now, release_name, asset["name"], asset["download_count"]])
 
 # CSVが存在しない場合はヘッダ付きで作成
 file_exists = os.path.isfile(CSV_PATH)
