@@ -2,6 +2,9 @@
 # Written By ChatGPT
 name: Daily GitHub Release Download Count
 
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: '0 0 * * *' # 毎日 0:00 UTC に実行
