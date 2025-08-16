@@ -25,6 +25,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Make Gradle wrapper executable
+        if: runner.os != 'windows'
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
