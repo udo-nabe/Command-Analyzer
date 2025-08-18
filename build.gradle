@@ -12,7 +12,7 @@ plugins {
     id 'com.vanniktech.maven.publish' version '0.34.0' //Please Comment Out
 }
 
-version = '1.0.2'
+version = '1.1.0'
 group = 'io.github.udo-nabe'
 
 //Please Comment Out: Begin
