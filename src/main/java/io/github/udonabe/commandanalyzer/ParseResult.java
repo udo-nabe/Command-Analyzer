@@ -21,4 +21,24 @@ import lombok.Builder;
  * @param rWhich   オプションを選択した結果。選択されたオプションのnameが代入される。
  */
 @Builder
-public record ParseResult(int rInt, boolean rBoolean, double rDouble, String rString, String rWhich, String rSubCommand) { }
+public record ParseResult(int rInt, boolean rBoolean, double rDouble, String rString, String rWhich, String rSubCommand, boolean present) {
+    public int orElseInt(int def) {
+        return present() ? rInt : def;
+    }
+
+    public boolean orElseBoolean(boolean def) {
+        return present() ? rBoolean : def;
+    }
+
+    public String orElseString(String def) {
+        return present() ? rString : def;
+    }
+
+    public String orElseWhich(String def) {
+        return present() ? rWhich : def;
+    }
+
+    public String orElseSubCommand(String def) {
+        return present() ? rSubCommand : def;
+    }
+}

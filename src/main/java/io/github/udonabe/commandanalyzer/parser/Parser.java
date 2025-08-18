@@ -154,11 +154,11 @@ public final class Parser {
         else if (matchIndex == -1) {
             if (kind == OptionGroup.Kind.WRAP) {
                 if (opt.getArgType() != NONE) {
-                    result.put(groupName, ParseResult.builder().build());
+                    result.put(groupName, ParseResult.builder().present(false).build());
                     return false;
                 }
             } else if (kind == OptionGroup.Kind.EQUAL || kind == OptionGroup.Kind.WHICH) {
-                result.put(groupName, ParseResult.builder().build());
+                result.put(groupName, ParseResult.builder().present(false).build());
                 return false;
             }
         }
@@ -180,6 +180,7 @@ public final class Parser {
     private static void putNone(Map<String, ParseResult> res, boolean val, String groupName) {
         res.put(groupName, ParseResult.builder()
                 .rBoolean(val)
+                .present(val)
                 .build());
     }
 
@@ -187,6 +188,7 @@ public final class Parser {
         if (value != null && value.matches("^[+-]?\\d+$")) {
             res.put(groupName, ParseResult.builder()
                     .rInt(Integer.parseInt(value))
+                    .present(true)
                     .build());
         } else {
             throw new OptionParseException("The type is different: " + value + " groupName=" + groupName);
@@ -197,6 +199,7 @@ public final class Parser {
         if (value != null) {
             res.put(groupName, ParseResult.builder()
                     .rString(value)
+                    .present(true)
                     .build());
         } else {
             throw new OptionParseException("The type is different: " + value + " groupName=" + groupName);
@@ -207,6 +210,7 @@ public final class Parser {
         if (value != null && value.matches("^[+-]?(\\d+(\\.\\d+)?)|(\\d+(\\.\\d+)?([eE][+-]?\\d+))$")) {
             res.put(groupName, ParseResult.builder()
                     .rDouble(Double.parseDouble(value))
+                    .present(true)
                     .build());
         } else {
             throw new OptionParseException("The type is different: " + value + " groupName=" + groupName);
@@ -217,6 +221,7 @@ public final class Parser {
         if (value != null && value.matches("(?i)true|(?i)false")) {
             res.put(groupName, ParseResult.builder()
                     .rBoolean(Boolean.parseBoolean(value))
+                    .present(true)
                     .build());
         } else {
             throw new OptionParseException("The type is different: " + value + " groupName=" + groupName);

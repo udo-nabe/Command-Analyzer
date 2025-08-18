@@ -332,8 +332,36 @@ public class ParserTest {
         ), new String[]{""});
         assertEquals(new HashMap<String, ParseResult>() {
             {
-                put("test", new ParseResult(0, false, 0.0, null, null, null));
+                put("test", new ParseResult(0, false, 0.0, null, null, null, false));
             }
         }, res);
+    }
+
+    @Test
+    void present() throws OptionParseException {
+        //present()やorElseXXX()が機能するか
+        Map<String, ParseResult> res =  Parser.parse(List.of(
+                new OptionGroup("test", OptionGroup.Kind.WRAP, false,
+                        new ShortOption("t", Option.ArgType.NONE))
+        ), new String[]{""});
+        assertFalse(res.get("test").present());
+
+        res =  Parser.parse(List.of(
+                new OptionGroup("test", OptionGroup.Kind.WRAP, false,
+                        new ShortOption("t", Option.ArgType.NONE))
+        ), new String[]{"-t"});
+        assertTrue(res.get("test").present());
+
+        res =  Parser.parse(List.of(
+                new OptionGroup("test", OptionGroup.Kind.WRAP, false,
+                        new ShortOption("t", Option.ArgType.STRING))
+        ), new String[]{""});
+        assertEquals("default", res.get("test").orElseString("default"));
+
+        res =  Parser.parse(List.of(
+                new OptionGroup("test", OptionGroup.Kind.WRAP, false,
+                        new ShortOption("t", Option.ArgType.STRING))
+        ), new String[]{"-t", "test"});
+        assertEquals("test", res.get("test").orElseString("default"));
     }
 }
