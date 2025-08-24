@@ -21,7 +21,7 @@ response = requests.get(url, headers=headers).json()
 now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 
 # 最新バージョン(人間が追加)
-LATEST_VERSION = "1.0.2"
+LATEST_VERSION = "1.1.0"
 
 # CSVに書き込むデータ
 rows = []
