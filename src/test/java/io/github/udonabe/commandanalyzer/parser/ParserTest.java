@@ -364,4 +364,17 @@ public class ParserTest {
         ), new String[]{"-t", "test"});
         assertEquals("test", res.get("test").orElseString("default"));
     }
+
+    @Test
+    void multi() throws OptionParseException {
+        // オプションをまとめる
+        var res =  Parser.parse(List.of(
+                new OptionGroup("test", OptionGroup.Kind.WRAP, false,
+                        new ShortOption("t", Option.ArgType.NONE)),
+                new OptionGroup("example", OptionGroup.Kind.WRAP, false,
+                        new ShortOption("e", Option.ArgType.NONE))
+        ), new String[]{"-te"});
+        assertTrue(res.get("test").rBoolean());
+        assertTrue(res.get("example").rBoolean());
+    }
 }

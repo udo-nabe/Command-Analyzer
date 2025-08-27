@@ -12,6 +12,7 @@ import io.github.udonabe.commandanalyzer.OptionParseException;
 import io.github.udonabe.commandanalyzer.ParseResult;
 import io.github.udonabe.commandanalyzer.option.Option;
 import io.github.udonabe.commandanalyzer.option.OptionGroup;
+import io.github.udonabe.commandanalyzer.option.ShortOption;
 
 import java.util.*;
 
@@ -123,6 +124,18 @@ public final class Parser {
                 del = str.substring(1);
             } else {
                 continue;
+            }
+            System.out.println(str.startsWith("-"));
+            System.out.println(del.length() > 1);
+            System.out.println(opt instanceof ShortOption);
+            System.out.println(opt.getArgType() == NONE);
+            System.out.println(del.contains(opt.getDisplayName()));
+
+            if (str.startsWith("-") && del.length() > 1 &&
+                opt instanceof ShortOption && opt.getArgType() == NONE &&
+                del.contains(opt.getDisplayName())) { // ショートオプションをまとめるのに対応
+                matchIndex = i;
+                break;
             }
 
             if (!names.contains(del)) {
