@@ -6,6 +6,11 @@
 
 (Added 2025/8/14:) It's finally been added to the [MVN Repository](https://mvnrepository.com/artifact/io.github.udo-nabe/command-analyzer)!
 
+
+(2025/8/25追記:) [Discordサーバー](https://discord.gg/cDvhJKgBjt)を開設しました。誰でも参加できるので、よろしければご参加お願いします。
+
+(Added 2025/8/25:) We have opened a [Discord server](https://discord.gg/cDvhJKgBjt). Anyone can join, so please join if you are interested.
+
 ## 特徴
 - 配布JARは依存関係ゼロ!
 - 配布JARのサイズは21KB!
