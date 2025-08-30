@@ -57,6 +57,7 @@ public class CommandOptions {
         public Builder option(String name, boolean required, Option opt) {
             checkNonAdded(name);
             checkOptionNonAdded(opt.getDisplayName());
+            checkValidType(opt);
             groups.add(new OptionGroup(name, OptionGroup.Kind.WRAP, required, opt));
             return this;
         }
@@ -69,6 +70,7 @@ public class CommandOptions {
          */
         public Builder equal(String name, boolean required, @NonNull Option... options) {
             checkNonAdded(name);
+            checkValidType(options);
             for (Option o : options) {
                 checkOptionNonAdded(o.getDisplayName());
             }
@@ -88,13 +90,15 @@ public class CommandOptions {
 
         /**
          * 複数のオプションを選択するグループを追加する。
-         * @param name グループの管理名。
+         *
+         * @param name     グループの管理名。
          * @param required このグループが必須かどうか。
-         * @param options 追加するオプション。nameとdisplayNameは異なる必要がある。
+         * @param options  追加するオプション。nameとdisplayNameは異なる必要がある。
          * @return 自分自身。
          */
         public Builder which(String name, boolean required, @NonNull Option... options) {
             checkNonAdded(name);
+            checkValidType(options);
             for (Option o : options) {
                 checkOptionNonAdded(o.getDisplayName());
             }
@@ -106,7 +110,7 @@ public class CommandOptions {
             Set<String> displaySeen = new HashSet<>();
 
             if (Arrays.stream(options).map(Option::getDisplayName)
-                        .anyMatch(d -> !displaySeen.add(d))) {
+                    .anyMatch(d -> !displaySeen.add(d))) {
                 throw new IllegalArgumentException("All instances must have unique fields 'name' and 'displayName'.");
             }
 
@@ -114,9 +118,16 @@ public class CommandOptions {
             return this;
         }
 
-        public Builder subCommand(@NonNull String name, @NonNull String... subCommands) {
+
+        /**
+         * サブコマンドを追加する。
+         * @param name サブコマンドの管理名。
+         * @param subCommands 追加するサブコマンド。
+         * @return 自分自身。
+         */
+        public Builder subCommand(@NonNull String name, @NonNull SubCommandOption... subCommands) {
             checkNonAdded(name);
-            for (String s : subCommands) {
+            for (String s : Arrays.stream(subCommands).map(Option::getDisplayName).toList()) {
                 checkOptionNonAdded(s);
             }
 
@@ -128,18 +139,39 @@ public class CommandOptions {
             Set<String> displaySeen = new HashSet<>();
 
             if (Arrays.stream(subCommands)
+                    .map(Option::getDisplayName)
                     .anyMatch(d -> !displaySeen.add(d))) {
                 throw new IllegalArgumentException("All strings must be unique.");
             }
 
-            List<Option> opts = new ArrayList<>();
-            for (String s : subCommands) {
-                opts.add(new SubCommandOption(s));
-            }
-            groups.add(new OptionGroup(name, OptionGroup.Kind.SUBCOMMAND, true, opts));
+            groups.add(new OptionGroup(name, OptionGroup.Kind.SUBCOMMAND, true, Arrays.asList(subCommands)));
             return this;
         }
 
+        /**
+         * サブコマンドを追加する。このメソッドで追加したサブコマンドは、子要素(child)が必ず{@code null}になります。
+         * @param name サブコマンドの管理名。
+         * @param subCommands 各サブコマンドの名前。
+         * @return 自分自身。
+         * @deprecated このメソッドは、{@link #subCommand(String, SubCommandOption...)}に移行しました。
+         * こちらの方が子要素を指定できて便利なので、それをお使いください。なお、このメソッドは2.0.0(パーサーコンビネーターの実装予定バージョン)
+         * で削除予定です。
+         */
+        @Deprecated(forRemoval = true, since = "1.2.0")
+        public Builder subCommand(String name, String... subCommands) {
+            return subCommand(name, Arrays.stream(subCommands).map(t -> new SubCommandOption(t, null))
+                    .toArray(SubCommandOption[]::new));
+        }
+
+        /**
+         * 引数を追加する。
+         * 例:
+         * java <b>com.example.Main</b>
+         * com.example.Mainの部分が、引数に当たる。
+         * @param name 引数の名前、管理名であって、表示名ではない。
+         * @param type 引数の型。
+         * @return 自分自身
+         */
         public Builder argument(@NonNull String name, @NonNull Option.ArgType type) {
             checkNonAdded(name);
             checkOptionNonAdded(name);
@@ -169,6 +201,14 @@ public class CommandOptions {
                     .anyMatch(t -> t.options().stream()
                             .anyMatch(t1 -> t1.getDisplayName().equals(name)))) {
                 throw new IllegalArgumentException("All options are must have unique field 'name'.");
+            }
+        }
+
+        private void checkValidType(Option... opts) {
+            for (Option opt : opts) {
+                if (opt instanceof ArgumentOption || opt instanceof SubCommandOption) {
+                    throw new IllegalArgumentException("Add ArgumentOption and SubCommandOption with argument() and subCommand() respectively.");
+                }
             }
         }
     }

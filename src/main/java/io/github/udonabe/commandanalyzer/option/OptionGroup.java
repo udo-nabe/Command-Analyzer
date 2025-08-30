@@ -8,6 +8,7 @@
 
 package io.github.udonabe.commandanalyzer.option;
 
+import io.github.udonabe.commandanalyzer.commnad.CommandOptions;
 import lombok.NonNull;
 
 import java.util.List;

@@ -8,16 +8,22 @@
 
 package io.github.udonabe.commandanalyzer.option;
 
+import io.github.udonabe.commandanalyzer.commnad.CommandOptions;
+import lombok.Getter;
+
 /**
  * 表示のみで、接頭辞もなく、値も受け取らないオプション。
  */
 public class SubCommandOption extends Option {
+    @Getter
+    private final CommandOptions child;
     /**
      * コンストラクタ。
      * argTypeは自動的にNONEになります。
      * @param displayName 表示名。
      */
-    public SubCommandOption(String displayName) {
+    public SubCommandOption(String displayName, CommandOptions child) {
         super("", displayName, ArgType.NONE);
+        this.child = child;
     }
 }

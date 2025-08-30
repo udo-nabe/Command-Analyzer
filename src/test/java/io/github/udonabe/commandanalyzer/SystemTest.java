@@ -12,6 +12,7 @@ import io.github.udonabe.commandanalyzer.commnad.CommandOptions;
 import io.github.udonabe.commandanalyzer.option.LongOption;
 import io.github.udonabe.commandanalyzer.option.Option;
 import io.github.udonabe.commandanalyzer.option.ShortOption;
+import io.github.udonabe.commandanalyzer.option.SubCommandOption;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +24,7 @@ public class SystemTest {
     @Test
     void simpleTest() throws OptionParseException {
         CommandOptions options = new CommandOptions.Builder()
-                .subCommand("mode", "decode", "encode")
+                .subCommand("mode", new SubCommandOption("encode", null), new SubCommandOption("decode", null))
                 .argument("multiple", Option.ArgType.INTEGER)
                 .argument("targetString", Option.ArgType.STRING)
                 .build();
@@ -37,7 +38,7 @@ public class SystemTest {
     }
 
     /**
-     * javaコマンドのテストを模擬する。
+     * javaコマンドを模擬する。
      */
     @Test
     void javaTest() throws OptionParseException {
@@ -54,5 +55,32 @@ public class SystemTest {
         var result = options.parse(new String[]{"--cp", ".", "com.example.main.Main"});
         assertEquals(".", result.get("classPath").rString());
         assertEquals("com.example.main.Main", result.get("mainClass").rString());
+    }
+
+    /**
+     * gitコマンドを模擬する。
+     * @throws OptionParseException
+     */
+    @Test
+    void gitTest() throws OptionParseException {
+        CommandOptions add = new CommandOptions.Builder()
+                .argument("fileName", Option.ArgType.STRING)
+                .build();
+        CommandOptions commit = new CommandOptions.Builder()
+                .option("amend", false, new LongOption("amend", Option.ArgType.NONE))
+                .option("message", true, new ShortOption("m", Option.ArgType.STRING))
+                .build();
+        CommandOptions options = new CommandOptions.Builder()
+                .subCommand("mode",
+                        new SubCommandOption("init", null),
+                        new SubCommandOption("add", add),
+                        new SubCommandOption("commit", commit))
+                .build();
+        var result = options.parse(new String[]{"init"});
+        assertEquals("init", result.get("mode").rSubCommand());
+
+        result = options.parse(new String[]{"commit", "-m", "This is a TEST-COMMIT."});
+        assertEquals("commit", result.get("mode").rSubCommand());
+        assertEquals("This is a TEST-COMMIT.", result.get("commit.message").rString());
     }
 }
