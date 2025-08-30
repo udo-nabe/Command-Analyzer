@@ -12,7 +12,6 @@ import io.github.udonabe.commandanalyzer.OptionParseException;
 import io.github.udonabe.commandanalyzer.ParseResult;
 import io.github.udonabe.commandanalyzer.commnad.CommandOptions;
 import io.github.udonabe.commandanalyzer.option.*;
-import io.github.udonabe.commandanalyzer.option.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +22,7 @@ import java.util.Map;
 /**
  * Parserのテストを行う。
  */
-public class ParserTest {
+public class InnerParserTest {
 
     /**
      * 最も基本的な、オプションの存在によって判断する場合のテスト。
@@ -31,10 +30,10 @@ public class ParserTest {
     @Test
     void exist() throws OptionParseException {
 
-        Map<String, ParseResult> eResult =  Parser.parse(List.of(
+        Map<String, ParseResult> eResult =  InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new ShortOption("e", Option.ArgType.NONE))
         ), new String[]{"-e"});
-        Map<String, ParseResult> neResult =  Parser.parse(List.of(
+        Map<String, ParseResult> neResult =  InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new ShortOption("e", Option.ArgType.NONE))
         ), new String[]{});
 
@@ -43,7 +42,7 @@ public class ParserTest {
 
         //不要なオプションの存在を検知できるか
         assertThrows(OptionParseException.class, () -> {
-            Parser.parse(new CommandOptions.Builder()
+            InnerParser.parse(new CommandOptions.Builder()
                         .option("example", false, new ShortOption("e", Option.ArgType.NONE))
                         .build()
                         .getGroups(),
@@ -52,7 +51,7 @@ public class ParserTest {
 
         //不要な引数の存在を検知できるか
         assertThrows(OptionParseException.class, () -> {
-            Parser.parse(new CommandOptions.Builder()
+            InnerParser.parse(new CommandOptions.Builder()
                             .option("example", false, new ShortOption("e", Option.ArgType.NONE))
                             .build()
                             .getGroups(),
@@ -65,38 +64,38 @@ public class ParserTest {
      */
     @Test
     void returnValue() throws OptionParseException {
-        Map<String, ParseResult> res =  Parser.parse(List.of(
+        Map<String, ParseResult> res =  InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new ShortOption("e", Option.ArgType.INTEGER))
         ), new String[]{"-e", "123"});
         assertSame(123, res.get("example").rInt());
 
-        res = Parser.parse(List.of(
+        res = InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new LongOption("example", Option.ArgType.STRING))
         ), new String[]{"--example", "This is a test."});
         assertEquals("This is a test.", res.get("example").rString());
 
-        res = Parser.parse(List.of(
+        res = InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new LongOption("example", Option.ArgType.DOUBLE))
         ), new String[]{"--example", "3.141592"});
         assertEquals(3.141592, res.get("example").rDouble());
 
-        res = Parser.parse(List.of(
+        res = InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new LongOption("example", Option.ArgType.DOUBLE))
         ), new String[]{"--example", "3141592e-6"});
         assertEquals(3141592e-6, res.get("example").rDouble());
 
-        res = Parser.parse(List.of(
+        res = InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new LongOption("example", Option.ArgType.BOOLEAN))
         ), new String[]{"--example", "true"});
         assertTrue(res.get("example").rBoolean());
 
-        res = Parser.parse(List.of(
+        res = InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new LongOption("example", Option.ArgType.BOOLEAN))
         ), new String[]{"--example", "fALse"});
         assertFalse(res.get("example").rBoolean());
 
         assertThrows(OptionParseException.class, () -> {
-            Map<String, ParseResult> resu = Parser.parse(List.of(
+            Map<String, ParseResult> resu = InnerParser.parse(List.of(
                     new OptionGroup("example", OptionGroup.Kind.WRAP, true, new LongOption("example", Option.ArgType.STRING))
             ), new String[]{"--eee", "aaa"});
             assertFalse(resu.get("example").rBoolean());
@@ -106,7 +105,7 @@ public class ParserTest {
     @Test
     void duplicate() {
         assertThrows(OptionParseException.class, () -> {
-            Parser.parse(List.of(), new String[]{"--foo", "--foo"});
+            InnerParser.parse(List.of(), new String[]{"--foo", "--foo"});
         });
     }
 
@@ -115,7 +114,7 @@ public class ParserTest {
      */
     @Test
     void multiOptions() throws OptionParseException {
-        Map<String, ParseResult> res =  Parser.parse(List.of(
+        Map<String, ParseResult> res =  InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false,
                         new ShortOption("e", Option.ArgType.NONE)),
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false,
@@ -124,7 +123,7 @@ public class ParserTest {
         assertTrue(res.get("example").rBoolean());
         assertTrue(res.get("test").rBoolean());
 
-        res = Parser.parse(List.of(
+        res = InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false,
                         new ShortOption("e", Option.ArgType.NONE)),
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false,
@@ -139,19 +138,19 @@ public class ParserTest {
      */
     @Test
     void noOrderSensitive() throws OptionParseException {
-        Parser.parse(List.of(
+        InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new ShortOption("e", Option.ArgType.NONE)),
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false, new ShortOption("t", Option.ArgType.NONE)),
                 new OptionGroup("command", OptionGroup.Kind.WRAP, false, new ShortOption("c", Option.ArgType.NONE))
         ), new String[]{"-e", "-t", "-c"});
 
-        Parser.parse(List.of(
+        InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new ShortOption("e", Option.ArgType.NONE)),
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false, new ShortOption("t", Option.ArgType.NONE)),
                 new OptionGroup("command", OptionGroup.Kind.WRAP, false, new ShortOption("c", Option.ArgType.NONE))
         ), new String[]{"-t", "-e", "-c"});
 
-        Map<String, ParseResult> res =  Parser.parse(List.of(
+        Map<String, ParseResult> res =  InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false, new ShortOption("e", Option.ArgType.INTEGER)),
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false, new ShortOption("t", Option.ArgType.STRING)),
                 new OptionGroup("command", OptionGroup.Kind.WRAP, false, new ShortOption("c", Option.ArgType.DOUBLE))
@@ -167,14 +166,14 @@ public class ParserTest {
      */
     @Test
     void equal() throws OptionParseException {
-        Map<String, ParseResult> res =  Parser.parse(List.of(
+        Map<String, ParseResult> res =  InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.EQUAL, false,
                         new ShortOption("e", Option.ArgType.INTEGER),
                         new LongOption("example", Option.ArgType.INTEGER))
         ), new String[]{"-e", "123"});
         assertEquals(123, res.get("example").rInt());
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("example", OptionGroup.Kind.EQUAL, false,
                         new ShortOption("e", Option.ArgType.INTEGER),
                         new LongOption("example", Option.ArgType.INTEGER))
@@ -187,14 +186,14 @@ public class ParserTest {
      */
     @Test
     void which() throws OptionParseException {
-        Map<String, ParseResult> res =  Parser.parse(List.of(
+        Map<String, ParseResult> res =  InnerParser.parse(List.of(
                 new OptionGroup("example_or_test", OptionGroup.Kind.WHICH, false,
                         new ShortOption("e", Option.ArgType.NONE),
                         new ShortOption("t", Option.ArgType.NONE))
         ), new String[]{"-e"});
         assertEquals("e", res.get("example_or_test").rWhich());
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("example_or_test", OptionGroup.Kind.WHICH, false,
                         new ShortOption("e", Option.ArgType.NONE),
                         new ShortOption("t", Option.ArgType.NONE))
@@ -203,7 +202,7 @@ public class ParserTest {
 
         //異常系: オプションが重複した場合の挙動
         assertThrows(OptionParseException.class, () -> {
-            Parser.parse(List.of(
+            InnerParser.parse(List.of(
                     new OptionGroup("which_test", OptionGroup.Kind.WHICH, false,
                             new ShortOption("e", Option.ArgType.NONE),
                             new ShortOption("t", Option.ArgType.NONE))
@@ -214,7 +213,7 @@ public class ParserTest {
     @Test
     void subCommand() throws OptionParseException {
         //正常系
-        Map<String, ParseResult> res =  Parser.parse(List.of(
+        Map<String, ParseResult> res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.SUBCOMMAND, true,
                         new SubCommandOption("foo"),
                         new SubCommandOption("bar"),
@@ -222,7 +221,7 @@ public class ParserTest {
         ), new String[]{"foo"});
         assertEquals("foo", res.get("test").rSubCommand());
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.SUBCOMMAND, true,
                         new SubCommandOption("foo"),
                         new SubCommandOption("bar"),
@@ -230,7 +229,7 @@ public class ParserTest {
         ), new String[]{"bar"});
         assertEquals("bar", res.get("test").rSubCommand());
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.SUBCOMMAND, true,
                         new SubCommandOption("foo"),
                         new SubCommandOption("bar"),
@@ -238,7 +237,7 @@ public class ParserTest {
         ), new String[]{"hoge"});
         assertEquals("hoge", res.get("test").rSubCommand());
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.SUBCOMMAND, true,
                         new SubCommandOption("foo"),
                         new SubCommandOption("bar"),
@@ -253,7 +252,7 @@ public class ParserTest {
 
         //異常系: 想定していない位置にサブコマンドがあった場合
         assertThrows(OptionParseException.class, () -> {
-            Parser.parse(List.of(
+            InnerParser.parse(List.of(
                     new OptionGroup("test", OptionGroup.Kind.SUBCOMMAND, true,
                             new SubCommandOption("foo"),
                             new SubCommandOption("bar"),
@@ -263,7 +262,7 @@ public class ParserTest {
 
         //異常系: サブコマンドが無かった場合
         assertThrows(OptionParseException.class, () -> {
-            Parser.parse(List.of(
+            InnerParser.parse(List.of(
                     new OptionGroup("test", OptionGroup.Kind.SUBCOMMAND, true,
                             new SubCommandOption("foo"),
                             new SubCommandOption("bar"),
@@ -273,7 +272,7 @@ public class ParserTest {
 
         //異常系: 想定と違うサブコマンドがあった場合
         assertThrows(OptionParseException.class, () -> {
-            Parser.parse(List.of(
+            InnerParser.parse(List.of(
                     new OptionGroup("test", OptionGroup.Kind.SUBCOMMAND, true,
                             new SubCommandOption("foo"),
                             new SubCommandOption("bar"),
@@ -285,19 +284,19 @@ public class ParserTest {
     @Test
     void argument() throws OptionParseException {
         //正常系
-        Map<String, ParseResult> res =  Parser.parse(List.of(
+        Map<String, ParseResult> res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.ARGUMENT, true,
                         new ArgumentOption(Option.ArgType.STRING))
         ), new String[]{"foo"});
         assertEquals("foo", res.get("test").rString());
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.ARGUMENT, true,
                         new ArgumentOption(Option.ArgType.INTEGER))
         ), new String[]{"123"});
         assertEquals(123, res.get("test").rInt());
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.ARGUMENT, true,
                         new ArgumentOption(Option.ArgType.INTEGER)),
                 new OptionGroup("test1", OptionGroup.Kind.ARGUMENT, true,
@@ -308,7 +307,7 @@ public class ParserTest {
 
         //異常系: 型が異なる場合
         assertThrows(OptionParseException.class, () -> {
-            Parser.parse(List.of(
+            InnerParser.parse(List.of(
                     new OptionGroup("test", OptionGroup.Kind.ARGUMENT, true,
                             new ArgumentOption(Option.ArgType.INTEGER))
             ), new String[]{"except"});
@@ -316,7 +315,7 @@ public class ParserTest {
 
         //異常系: 引数が無い場合
         assertThrows(OptionParseException.class, () -> {
-            Parser.parse(List.of(
+            InnerParser.parse(List.of(
                     new OptionGroup("test", OptionGroup.Kind.ARGUMENT, true,
                             new ArgumentOption(Option.ArgType.INTEGER))
             ), new String[]{""});
@@ -326,7 +325,7 @@ public class ParserTest {
     @Test
     void notFound() throws OptionParseException {
         //想定していたオプション(required=false)が無い場合の挙動
-        Map<String, ParseResult> res =  Parser.parse(List.of(
+        Map<String, ParseResult> res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false,
                         new ShortOption("t", Option.ArgType.STRING))
         ), new String[]{""});
@@ -340,25 +339,25 @@ public class ParserTest {
     @Test
     void present() throws OptionParseException {
         //present()やorElseXXX()が機能するか
-        Map<String, ParseResult> res =  Parser.parse(List.of(
+        Map<String, ParseResult> res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false,
                         new ShortOption("t", Option.ArgType.NONE))
         ), new String[]{""});
         assertFalse(res.get("test").present());
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false,
                         new ShortOption("t", Option.ArgType.NONE))
         ), new String[]{"-t"});
         assertTrue(res.get("test").present());
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false,
                         new ShortOption("t", Option.ArgType.STRING))
         ), new String[]{""});
         assertEquals("default", res.get("test").orElseString("default"));
 
-        res =  Parser.parse(List.of(
+        res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false,
                         new ShortOption("t", Option.ArgType.STRING))
         ), new String[]{"-t", "test"});
@@ -368,7 +367,7 @@ public class ParserTest {
     @Test
     void multi() throws OptionParseException {
         // オプションをまとめる
-        var res =  Parser.parse(List.of(
+        var res =  InnerParser.parse(List.of(
                 new OptionGroup("test", OptionGroup.Kind.WRAP, false,
                         new ShortOption("t", Option.ArgType.NONE)),
                 new OptionGroup("example", OptionGroup.Kind.WRAP, false,

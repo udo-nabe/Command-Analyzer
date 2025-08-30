@@ -14,7 +14,7 @@ import io.github.udonabe.commandanalyzer.option.ArgumentOption;
 import io.github.udonabe.commandanalyzer.option.Option;
 import io.github.udonabe.commandanalyzer.option.OptionGroup;
 import io.github.udonabe.commandanalyzer.option.SubCommandOption;
-import io.github.udonabe.commandanalyzer.parser.Parser;
+import io.github.udonabe.commandanalyzer.parser.InnerParser;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -35,7 +35,7 @@ public class CommandOptions {
     }
 
     public Map<String, ParseResult> parse(String[] args) throws OptionParseException {
-        return Parser.parse(groups, args);
+        return InnerParser.parse(groups, args);
     }
 
     /**
