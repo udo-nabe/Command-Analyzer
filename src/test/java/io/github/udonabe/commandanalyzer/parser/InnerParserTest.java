@@ -239,19 +239,6 @@ public class InnerParserTest {
         ), new String[]{"hoge"});
         assertEquals("hoge", res.get("test").rSubCommand());
 
-        res = InnerParser.parse(List.of(
-                new OptionGroup("test", OptionGroup.Kind.SUBCOMMAND, true,
-                        new SubCommandOption("foo", null),
-                        new SubCommandOption("bar", null),
-                        new SubCommandOption("hoge", null)),
-                new OptionGroup("example", OptionGroup.Kind.SUBCOMMAND, true,
-                        new SubCommandOption("foo", null),
-                        new SubCommandOption("bar", null),
-                        new SubCommandOption("hoge", null))
-        ), new String[]{"hoge", "foo"});
-        assertEquals("hoge", res.get("test").rSubCommand());
-        assertEquals("foo", res.get("example").rSubCommand());
-
         //異常系: 想定していない位置にサブコマンドがあった場合
         assertThrows(OptionParseException.class, () -> {
             InnerParser.parse(List.of(

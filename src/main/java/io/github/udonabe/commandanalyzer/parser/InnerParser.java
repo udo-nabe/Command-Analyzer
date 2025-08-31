@@ -107,17 +107,11 @@ public final class InnerParser {
 
                 case ARGUMENT -> {
                     int commandIndex = groups.indexOf(group);
-                    //Optional<Option> match = Optional.empty();
                     try {
                         put(group.options().getFirst(), result, commandIndex, targets[commandIndex], prefix + group.name());
                     } catch (OptionParseException e) {
-                        throw new OptionParseException("Argument Group \"" + group.name() + "\" not found or invalid.");
+                        throw new OptionParseException("Argument Group \"" + group.name() + "\" not found or invalid.", e);
                     }
-//                    if (match.isEmpty())
-//                        throw new OptionParseException("Argument Group \"" + group.name() + "\" not found.");
-//                    result.put(group.name(), ParseResult.builder()
-//                            .rSubCommand(match.get().getDisplayName())
-//                            .build());
                 }
             }
         }

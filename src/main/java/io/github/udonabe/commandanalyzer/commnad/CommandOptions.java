@@ -184,6 +184,11 @@ public class CommandOptions {
             checkNonAdded(name);
             checkOptionNonAdded(name);
 
+            //これより前に追加されたオプションの中で、required=falseがある場合、エラーにする
+//            for (OptionGroup grp : groups) {
+//                if (!grp.required()) throw new IllegalStateException("All options before the argument must be required.");
+//            }
+
             groups.add(new OptionGroup(name, OptionGroup.Kind.ARGUMENT, true, new ArgumentOption(type)));
             return this;
         }
