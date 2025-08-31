@@ -34,7 +34,8 @@ public final class InnerParser {
      */
     public static Map<String, ParseResult> parse(List<OptionGroup> groups, String[] targets) throws OptionParseException {
         Map<String, ParseResult> result = new HashMap<>();
-        Set<String> names = initNames(groups, true);
+        Set<String> names = new HashSet<>();
+        initNames(names, groups, true);
 
         //targetsの重複&不要な引数がないかを調べる
         Set<String> seen = new HashSet<>();
@@ -100,7 +101,8 @@ public final class InnerParser {
                         result.putAll(res);
                     } else {
                         //引数の再チェックを行う
-                        Set<String> unRecursionNames = initNames(groups, false);
+                        Set<String> unRecursionNames = new HashSet<>();
+                        initNames(unRecursionNames, groups, false);
                         for (String s : targets) {
                             checkContainsName(unRecursionNames, s);
                         }
@@ -127,27 +129,26 @@ public final class InnerParser {
     }
 
     private static void checkContainsName(Set<String> names, String str) throws OptionParseException {
-        String del;
-        if (str.startsWith("--")) {
-            del = str.substring(2);
-        } else if (str.startsWith("-")) {
-            del = str.substring(1);
-        } else {
-            return;
-        }
-        if (!names.contains(del)) {
-            if (str.matches("-[^-]{2,}")) return;
+//        String del;
+//        if (str.startsWith("--")) {
+//            del = str.substring(2);
+//        } else if (str.startsWith("-")) {
+//            del = str.substring(1);
+//        } else {
+//            return;
+//        }
+        if (!names.contains(str)) {
+            if (str.matches("(^-[^-]{2,}$)") || !str.startsWith("-")) return;
             throw new OptionParseException("Unknown option: " + str);
         }
     }
 
-    private static Set<String> initNames(List<OptionGroup> groups, boolean isRecursion) {
-        Set<String> names = new HashSet<>();
+    private static Set<String> initNames(Set<String> names, List<OptionGroup> groups, boolean isRecursion) {
         for (OptionGroup group : groups) {
             for (Option opt : group.options()) {
-                names.add(opt.getDisplayName());
+                names.add(opt.getPrefix() + opt.getDisplayName());
                 if (opt instanceof SubCommandOption sub && sub.getChild() != null && isRecursion) {
-                    names.addAll(initNames(sub.getChild().getGroups(), true));
+                    initNames(names, sub.getChild().getGroups(), true);
                 }
             }
         }

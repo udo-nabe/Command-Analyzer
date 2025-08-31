@@ -43,6 +43,7 @@ public class CommandOptions {
      */
     public static class Builder {
         private final List<OptionGroup> groups;
+        private final Set<String> groupNames = new HashSet<>(), optionNames = new HashSet<>();
 
         public Builder() {
             this.groups = new ArrayList<>();
@@ -78,10 +79,13 @@ public class CommandOptions {
             if (options.length == 0) {
                 throw new IllegalArgumentException("The argument 'options' cannot be null or empty.");
             }
-            //displayNameとprefix以外が等価か判定する
-            if (Arrays.stream(options).map(Option::getArgType)
-                        .distinct().limit(2).count() != 1) {
-                throw new IllegalArgumentException("All instances must have equivalent fields except for displayName and prefix.");
+            Option.ArgType firstType = options[0].getArgType();
+            for (int i = 1; i < options.length; i++) {
+                if (options[i].getArgType() != firstType) {
+                    throw new IllegalArgumentException(
+                            "All instances must have equivalent fields except for displayName and prefix."
+                    );
+                }
             }
 
             groups.add(new OptionGroup(name, OptionGroup.Kind.EQUAL, required, options));
@@ -109,9 +113,10 @@ public class CommandOptions {
             //nameかdisplayNameが一つでも重複した場合、エラーを出す。
             Set<String> displaySeen = new HashSet<>();
 
-            if (Arrays.stream(options).map(Option::getDisplayName)
-                    .anyMatch(d -> !displaySeen.add(d))) {
-                throw new IllegalArgumentException("All instances must have unique fields 'name' and 'displayName'.");
+            for (Option s : options) {
+                if (!displaySeen.add(s.getDisplayName())) {
+                    throw new IllegalArgumentException("All instances must have unique fields 'displayName'.");
+                }
             }
 
             groups.add(new OptionGroup(name, OptionGroup.Kind.WHICH, required, options));
@@ -137,14 +142,13 @@ public class CommandOptions {
 
             //一つでも重複した場合、エラーを出す。
             Set<String> displaySeen = new HashSet<>();
-
-            if (Arrays.stream(subCommands)
-                    .map(Option::getDisplayName)
-                    .anyMatch(d -> !displaySeen.add(d))) {
-                throw new IllegalArgumentException("All strings must be unique.");
+            for (SubCommandOption s : subCommands) {
+                if (!displaySeen.add(s.getDisplayName())) {
+                    throw new IllegalArgumentException("All strings must be unique.");
+                }
             }
 
-            groups.add(new OptionGroup(name, OptionGroup.Kind.SUBCOMMAND, true, Arrays.asList(subCommands)));
+            groups.add(new OptionGroup(name, OptionGroup.Kind.SUBCOMMAND, true, subCommands));
             return this;
         }
 
@@ -190,17 +194,14 @@ public class CommandOptions {
         }
 
         private void checkNonAdded(String name) {
-            if (groups.stream()
-                    .anyMatch(t -> t.name().equals(name))) {
+            if (!groupNames.add(name)) {
                 throw new IllegalArgumentException("All groups are must have unique field 'name'.");
             }
         }
 
         private void checkOptionNonAdded(String name) {
-            if (groups.stream()
-                    .anyMatch(t -> t.options().stream()
-                            .anyMatch(t1 -> t1.getDisplayName().equals(name)))) {
-                throw new IllegalArgumentException("All options are must have unique field 'name'.");
+            if (!optionNames.add(name)) {
+                throw new IllegalArgumentException("All groups are must have unique field 'name'.");
             }
         }
 
