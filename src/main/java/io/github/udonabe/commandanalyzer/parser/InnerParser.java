@@ -12,7 +12,6 @@ import io.github.udonabe.commandanalyzer.OptionParseException;
 import io.github.udonabe.commandanalyzer.ParseResult;
 import io.github.udonabe.commandanalyzer.option.Option;
 import io.github.udonabe.commandanalyzer.option.OptionGroup;
-import io.github.udonabe.commandanalyzer.option.ShortOption;
 import io.github.udonabe.commandanalyzer.option.SubCommandOption;
 
 import java.util.*;
@@ -45,9 +44,35 @@ public final class InnerParser {
             }
             checkContainsName(names, s);
         }
-        parseImpl(groups, targets, result, names, "");
+
+        List<String> newTargets = expandShortOption(targets);
+        String[] buf = new String[newTargets.size()];
+        parseImpl(groups, newTargets.toArray(buf), result, names, "");
 
         return result;
+    }
+
+    private static List<String> expandShortOption(String[] targets) throws OptionParseException {
+        List<String> newTargets = new ArrayList<>();
+        //targetsのまとめられたショートオプションを展開する
+        for (String opt : targets) {
+            if (!opt.startsWith("--") && opt.startsWith("-") && opt.length() > 1) {
+                String noPrefix = opt.substring(1);
+                char[] opts = new char[noPrefix.length()];
+                noPrefix.getChars(0, noPrefix.length(), opts, 0);
+
+                //重複があった場合、エラー
+                //それ以外の場合展開し、追加する
+                Set<Character> charSeen = new HashSet<>();
+                for (char ch : opts) {
+                    if (!charSeen.add(ch)) throw new OptionParseException("Multi-ShortOption duplicated:" + opt);
+                    newTargets.add("-" + ch);
+                }
+            } else { //当てはまらない場合、そのまま追加する
+                newTargets.add(opt);
+            }
+        }
+        return newTargets;
     }
 
     private static Map<String, ParseResult> parseImpl(List<OptionGroup> groups, String[] targets, Map<String, ParseResult> result, Set<String> names, String prefix) throws OptionParseException {
@@ -78,36 +103,7 @@ public final class InnerParser {
                 }
 
                 //SubCommandの場合は、無条件でrequiredがtrueとみなす。
-                case SUBCOMMAND -> {
-                    int commandIndex = groups.indexOf(group);
-                    Optional<Option> match = group.options().stream()
-                            .filter(t -> t.getDisplayName().equals(targets[commandIndex]))
-                            .findFirst();
-                    if (match.isEmpty())
-                        throw new OptionParseException("SubCommand Group \"" + group.name() + "\" not found.");
-                    result.put(prefix + group.name(), ParseResult.builder()
-                            .rSubCommand(match.get().getDisplayName())
-                            .build());
-                    System.out.println(match.get());
-
-
-                    //子がある場合、子をパース
-                    if (match.get() instanceof SubCommandOption subOpt && subOpt.getChild() != null) {
-                        List<OptionGroup> grp = subOpt.getChild().getGroups();
-                        String[] targs = Arrays.copyOfRange(targets, commandIndex, targets.length);
-                        System.out.println(Arrays.toString(targs));
-
-                        var res = parseImpl(grp, targs, result, names, match.get().getDisplayName() + ".");
-                        result.putAll(res);
-                    } else {
-                        //引数の再チェックを行う
-                        Set<String> unRecursionNames = new HashSet<>();
-                        initNames(unRecursionNames, groups, false);
-                        for (String s : targets) {
-                            checkContainsName(unRecursionNames, s);
-                        }
-                    }
-                }
+                case SUBCOMMAND -> parseSubCommand(groups, group, targets, result, prefix, names);
 
                 case ARGUMENT -> {
                     int commandIndex = groups.indexOf(group);
@@ -143,7 +139,7 @@ public final class InnerParser {
         }
     }
 
-    private static Set<String> initNames(Set<String> names, List<OptionGroup> groups, boolean isRecursion) {
+    private static void initNames(Set<String> names, List<OptionGroup> groups, boolean isRecursion) {
         for (OptionGroup group : groups) {
             for (Option opt : group.options()) {
                 names.add(opt.getPrefix() + opt.getDisplayName());
@@ -152,12 +148,40 @@ public final class InnerParser {
                 }
             }
         }
-        return names;
+    }
+
+    private static void parseSubCommand(List<OptionGroup> groups, OptionGroup group, String[] targets, Map<String, ParseResult> result, String prefix, Set<String> names) throws OptionParseException {
+        int commandIndex = groups.indexOf(group);
+        Optional<Option> match = group.options().stream()
+                .filter(t -> t.getDisplayName().equals(targets[commandIndex]))
+                .findFirst();
+        if (match.isEmpty())
+            throw new OptionParseException("SubCommand Group \"" + group.name() + "\" not found.");
+        result.put(prefix + group.name(), ParseResult.builder()
+                .rSubCommand(match.get().getDisplayName())
+                .build());
+
+
+        //子がある場合、子をパース
+        if (match.get() instanceof SubCommandOption subOpt && subOpt.getChild() != null) {
+            List<OptionGroup> grp = subOpt.getChild().getGroups();
+            String[] targs = Arrays.copyOfRange(targets, commandIndex, targets.length);
+
+            var res = parseImpl(grp, targs, result, names, match.get().getDisplayName() + ".");
+            result.putAll(res);
+        } else {
+            //引数の再チェックを行う
+            Set<String> unRecursionNames = new HashSet<>();
+            initNames(unRecursionNames, groups, false);
+            for (String s : targets) {
+                checkContainsName(unRecursionNames, s);
+            }
+        }
     }
 
     private static boolean searchAndPut(String groupName, boolean isRequired, String[] targets, Map<String, ParseResult> result, Option opt, OptionGroup.Kind kind, Set<String> names) throws OptionParseException {
         //インデックスを探す必要があるため、あえてStream APIではなく、forループを使う。
-        int matchIndex = -1;
+        int matchIndex = -1; //-1の場合、マッチしなかったことを表す
         String value = null;
         for (int i = 0; i < targets.length; i++) {
             String str = targets[i];
@@ -172,32 +196,12 @@ public final class InnerParser {
             } else {
                 continue;
             }
+            MatchResult matchResult = match(opt, del, i, targets, groupName);
 
-            if (str.startsWith("-") && del.length() > 1 &&
-                opt instanceof ShortOption && opt.getArgType() == NONE &&
-                del.contains(opt.getDisplayName())) { // ショートオプションをまとめるのに対応
-                matchIndex = i;
+            value = matchResult.value();
+            matchIndex = matchResult.matchIndex();
+            if (matchResult.matchIndex() != -1) {
                 break;
-            }
-
-            if (opt.getDisplayName().equals(del)) {
-                if (opt.getArgType() != NONE && i < targets.length - 1) {
-                    value = targets[i + 1];
-                    matchIndex = i;
-                    break;
-                } else if (opt.getArgType() == NONE) {
-                    //不要な引数がある場合、エラーを出すようにする。
-                    if (i < targets.length - 1) {
-                        String arg = targets[i + 1];
-
-                        if (!arg.matches("(-|--).*")) {
-                            throw new OptionParseException("Option " + opt.getPrefix() + opt.getDisplayName() + " does not accept arguments");
-                        }
-                    }
-                    matchIndex = i;
-                } else {
-                    throw new OptionParseException("Option argument not found. groupName=\"" + groupName + "\" argType=" + opt.getArgType());
-                }
             }
         }
         if (matchIndex == -1 && isRequired && opt.getArgType() != NONE)
@@ -218,6 +222,31 @@ public final class InnerParser {
         return true;
     }
 
+    private  record MatchResult(String value, int matchIndex) {
+
+    }
+
+    private static MatchResult match(Option opt, String del, int i, String[] targets, String groupName) throws OptionParseException {
+        if (opt.getDisplayName().equals(del)) {
+            if (opt.getArgType() != NONE && i < targets.length - 1) {
+                return new MatchResult(targets[i + 1], i);
+            } else if (opt.getArgType() == NONE) {
+                //不要な引数がある場合、エラーを出すようにする。
+                if (i < targets.length - 1) {
+                    String arg = targets[i + 1];
+
+                    if (!arg.matches("(-|--).*")) {
+                        throw new OptionParseException("Option " + opt.getPrefix() + opt.getDisplayName() + " does not accept arguments");
+                    }
+                }
+                return new MatchResult(null, i);
+            } else {
+                throw new OptionParseException("Option argument not found. groupName=\"" + groupName + "\" argType=" + opt.getArgType());
+            }
+        }
+        return new MatchResult(null, -1);
+    }
+
     private static void put(Option opt, Map<String, ParseResult> result, int matchIndex, String value, String groupName) throws OptionParseException {
         switch (opt.getArgType()) {
             case NONE -> putNone(result, matchIndex != -1, groupName);
@@ -235,8 +264,12 @@ public final class InnerParser {
                 .build());
     }
 
+    private static final String INTEGER_REGEX = "^[+-]?\\d+$";
+    private static final String DOUBLE_REGEX = "^[+-]?(\\d+(\\.\\d+)?)|(\\d+(\\.\\d+)?([eE][+-]?\\d+))$";
+    private static final String BOOLEAN_REGEX = "(?i)true|(?i)false";
+
     private static void putInteger(Map<String, ParseResult> res, String value, String groupName) throws OptionParseException {
-        if (value != null && value.matches("^[+-]?\\d+$")) {
+        if (value != null && value.matches(INTEGER_REGEX)) {
             res.put(groupName, ParseResult.builder()
                     .rInt(Integer.parseInt(value))
                     .present(true)
@@ -258,7 +291,7 @@ public final class InnerParser {
     }
 
     private static void putDouble(Map<String, ParseResult> res, String value, String groupName) throws OptionParseException {
-        if (value != null && value.matches("^[+-]?(\\d+(\\.\\d+)?)|(\\d+(\\.\\d+)?([eE][+-]?\\d+))$")) {
+        if (value != null && value.matches(DOUBLE_REGEX)) {
             res.put(groupName, ParseResult.builder()
                     .rDouble(Double.parseDouble(value))
                     .present(true)
@@ -269,7 +302,7 @@ public final class InnerParser {
     }
 
     private static void putBoolean(Map<String, ParseResult> res, String value, String groupName) throws OptionParseException {
-        if (value != null && value.matches("(?i)true|(?i)false")) {
+        if (value != null && value.matches(BOOLEAN_REGEX)) {
             res.put(groupName, ParseResult.builder()
                     .rBoolean(Boolean.parseBoolean(value))
                     .present(true)

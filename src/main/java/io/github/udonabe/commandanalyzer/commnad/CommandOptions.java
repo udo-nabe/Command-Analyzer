@@ -140,6 +140,10 @@ public class CommandOptions {
                 throw new IllegalArgumentException("The argument 'subCommands' cannot be null or empty.");
             }
 
+            if (!groups.isEmpty()) {
+                throw new IllegalArgumentException("The subcommand must come first.");
+            }
+
             //一つでも重複した場合、エラーを出す。
             Set<String> displaySeen = new HashSet<>();
             for (SubCommandOption s : subCommands) {
