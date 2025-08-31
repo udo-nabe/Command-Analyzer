@@ -151,7 +151,7 @@ public final class InnerParser {
     }
 
     private static void parseSubCommand(List<OptionGroup> groups, OptionGroup group, String[] targets, Map<String, ParseResult> result, String prefix, Set<String> names) throws OptionParseException {
-        int commandIndex = groups.indexOf(group);
+        int commandIndex = 0; // CommandOptionsの仕様で、サブコマンドは最初にしか追加できない。
         Optional<Option> match = group.options().stream()
                 .filter(t -> t.getDisplayName().equals(targets[commandIndex]))
                 .findFirst();
