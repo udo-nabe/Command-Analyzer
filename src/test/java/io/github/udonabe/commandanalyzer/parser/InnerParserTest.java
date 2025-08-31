@@ -403,4 +403,13 @@ public class InnerParserTest {
                 .build().getGroups(), new String[]{"foo"});
         assertEquals("foo", res.get("test").rSubCommand());
     }
+
+    @Test
+    void slashOption() throws OptionParseException {
+        //Windowsタイプのオプションのテスト
+        Map<String, ParseResult> res = InnerParser.parse(new CommandOptions.Builder()
+                .option("test", false, new SlashOption("foo", Option.ArgType.STRING))
+                .build().getGroups(), new String[]{"/foo", "TEST"});
+        assertEquals("TEST", res.get("test").rString());
+    }
 }

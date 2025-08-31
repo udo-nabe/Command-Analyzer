@@ -12,7 +12,7 @@ package io.github.udonabe.commandanalyzer.option;
  * このクラスは、「--」が接頭辞にあるオプションを表します。
  * このオプションは、まとめることができません。
  */
-public class LongOption extends Option {
+public final class LongOption extends Option {
     public LongOption(String displayName, ArgType type) {
         super("--", displayName, type);
     }

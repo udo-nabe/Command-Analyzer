@@ -13,7 +13,7 @@ import lombok.NonNull;
 /**
  * 値のみが入力されるオプション。
  */
-public class ArgumentOption extends Option {
+public final class ArgumentOption extends Option {
     /**
      * コンストラクタ。
      * @param argType 引数の種別。

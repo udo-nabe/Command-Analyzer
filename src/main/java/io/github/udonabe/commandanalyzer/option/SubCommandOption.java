@@ -14,7 +14,7 @@ import lombok.Getter;
 /**
  * 表示のみで、接頭辞もなく、値も受け取らないオプション。
  */
-public class SubCommandOption extends Option {
+public final class SubCommandOption extends Option {
     @Getter
     private final CommandOptions child;
     /**

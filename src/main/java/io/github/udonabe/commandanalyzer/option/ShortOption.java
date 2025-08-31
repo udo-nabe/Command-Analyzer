@@ -13,7 +13,7 @@ package io.github.udonabe.commandanalyzer.option;
  * このクラスは、「-」が接頭辞にあるオプションを表します。
  * このオプションは、まとめることができます。
  */
-public class ShortOption extends Option {
+public final class ShortOption extends Option {
     public ShortOption(String displayName, ArgType type) {
         super("-", displayName, type);
         if (displayName.length() != 1) {

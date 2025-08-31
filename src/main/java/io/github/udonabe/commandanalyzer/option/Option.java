@@ -24,7 +24,7 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @ToString
-public class Option {
+public sealed class Option permits ArgumentOption, LongOption, ShortOption, SlashOption, SubCommandOption {
     /**
      * オプションの接頭辞。空にすることもできます。
      * 注意: このクラスを直接インスタンス化しても、子クラス特有の機能(ショートオプションをまとめられるなど)は付与されません。
@@ -54,11 +54,11 @@ public class Option {
             }
         }
         if (displayName != null) {
-            if (!(prefix.equals("-") || prefix.equals("--") || prefix.isEmpty())) {
-                throw new IllegalArgumentException("Argument prefix must be \"-\" or \"--\" or empty.");
+            if (!(prefix.equals("-") || prefix.equals("--") || prefix.equals("/") || prefix.isEmpty())) {
+                throw new IllegalArgumentException("Argument prefix must be \"-\" or \"--\" or \"/\" or empty.");
             }
-            if (displayName.startsWith("-") || displayName.startsWith("--")) {
-                throw new IllegalArgumentException("Argument displayName cannot be \"-\" or \"--\"");
+            if (displayName.startsWith("-") || displayName.startsWith("--") || displayName.startsWith("/")) {
+                throw new IllegalArgumentException("Argument displayName cannot be \"-\" or \"--\" or \"/\"");
             }
         }
 

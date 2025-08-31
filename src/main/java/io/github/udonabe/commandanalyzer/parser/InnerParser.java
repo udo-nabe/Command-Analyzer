@@ -54,7 +54,7 @@ public final class InnerParser {
 
     private static List<String> expandShortOption(String[] targets) throws OptionParseException {
         List<String> newTargets = new ArrayList<>();
-        //targetsのまとめられたショートオプションを展開する
+        //まとめられたショートオプションを展開する
         for (String opt : targets) {
             if (!opt.startsWith("--") && opt.startsWith("-") && opt.length() > 1) {
                 String noPrefix = opt.substring(1);
@@ -188,15 +188,10 @@ public final class InnerParser {
 
             if (str.isEmpty()) continue;
 
-            String del;
-            if (str.startsWith("--")) {
-                del = str.substring(2);
-            } else if (str.startsWith("-")) {
-                del = str.substring(1);
-            } else {
+            if (!str.startsWith("-") && !str.startsWith("/")) {
                 continue;
             }
-            MatchResult matchResult = match(opt, del, i, targets, groupName);
+            MatchResult matchResult = match(opt, str, i, targets, groupName);
 
             value = matchResult.value();
             matchIndex = matchResult.matchIndex();
@@ -226,8 +221,8 @@ public final class InnerParser {
 
     }
 
-    private static MatchResult match(Option opt, String del, int i, String[] targets, String groupName) throws OptionParseException {
-        if (opt.getDisplayName().equals(del)) {
+    private static MatchResult match(Option opt, String str, int i, String[] targets, String groupName) throws OptionParseException {
+        if ((opt.getPrefix() + opt.getDisplayName()).equals(str)) {
             if (opt.getArgType() != NONE && i < targets.length - 1) {
                 return new MatchResult(targets[i + 1], i);
             } else if (opt.getArgType() == NONE) {
