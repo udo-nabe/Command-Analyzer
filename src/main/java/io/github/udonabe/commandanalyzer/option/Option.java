@@ -8,35 +8,30 @@
 
 package io.github.udonabe.commandanalyzer.option;
 
-import lombok.Getter;
+import lombok.NonNull;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * コマンドのオプションを表すクラス。
  */
-public final class Option {
-    private final Kind kind;
-    private final List<String> names;
+public sealed class Option implements Cloneable {
+    private final Set<OptionDisplay> displays;
     private final ArgType type;
     private final boolean required;
-    private final String exclusiveGroup;
     private final String description;
     private final String managementName;
 
-    private Option(Kind kind,
-                  List<String> names,
-                  ArgType type,
-                  boolean required,
-                  String exclusiveGroup,
-                  String description,
-                  String managementName) {
-        this.kind = kind;
-        this.names = names;
+    private Option(@NonNull Set<OptionDisplay> displays,
+                   @NonNull ArgType type,
+                   boolean required,
+                   String description,
+                   @NonNull String managementName) {
+        this.displays = displays;
         this.type = type;
         this.required = required;
-        this.exclusiveGroup = exclusiveGroup;
         this.description = description;
         this.managementName = managementName;
     }
@@ -48,27 +43,11 @@ public final class Option {
      * @return 調べた結果。
      */
     public boolean matches(String in) {
-        return names.stream().anyMatch(n -> (kind.getPrefix() + n).equals(in));
+        return displays.stream().anyMatch(n -> n.getFullDisplay().equals(in));
     }
 
-    public static Option shortOption(String name, ArgType type, boolean required, String description, String managementName) {
-        return new Option(Kind.SHORT_OPTION, List.of(name), type, required, null, description, managementName);
-    }
-
-    public static Option longOption(String name, ArgType type, boolean required, String description, String managementName) {
-        return new Option(Kind.LONG_OPTION, List.of(name), type, required, null, description, managementName);
-    }
-
-    public static Option slashOption(String name, ArgType type, boolean required, String description, String managementName) {
-        return new Option(Kind.SLASH_OPTION, List.of(name), type, required, null, description, managementName);
-    }
-
-    public Kind kind() {
-        return kind;
-    }
-
-    public List<String> names() {
-        return names;
+    public Set<OptionDisplay> displays() {
+        return displays;
     }
 
     public ArgType type() {
@@ -77,10 +56,6 @@ public final class Option {
 
     public boolean required() {
         return required;
-    }
-
-    public String exclusiveGroup() {
-        return exclusiveGroup;
     }
 
     public String description() {
@@ -92,49 +67,25 @@ public final class Option {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (Option) obj;
-        return Objects.equals(this.kind, that.kind) &&
-               Objects.equals(this.names, that.names) &&
-               Objects.equals(this.type, that.type) &&
-               this.required == that.required &&
-               Objects.equals(this.exclusiveGroup, that.exclusiveGroup) &&
-               Objects.equals(this.description, that.description) &&
-               Objects.equals(this.managementName, that.managementName);
+    public final boolean equals(Object o) {
+        if (!(o instanceof Option option)) return false;
+
+        return required == option.required && displays.equals(option.displays) && type == option.type && Objects.equals(description, option.description) && managementName.equals(option.managementName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(kind, names, type, required, exclusiveGroup, description, managementName);
+        int result = displays.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + Boolean.hashCode(required);
+        result = 31 * result + Objects.hashCode(description);
+        result = 31 * result + managementName.hashCode();
+        return result;
     }
 
     @Override
-    public String toString() {
-        return "Option[" +
-               "kind=" + kind + ", " +
-               "names=" + names + ", " +
-               "type=" + type + ", " +
-               "required=" + required + ", " +
-               "exclusiveGroup=" + exclusiveGroup + ", " +
-               "description=" + description + ", " +
-               "managementName=" + managementName + ']';
-    }
-
-
-    public enum Kind {
-        SHORT_OPTION("-"),
-        LONG_OPTION("--"),
-        SLASH_OPTION("/"),
-        SUBCOMMAND(""),
-        ARGUMENT("");
-        @Getter
-        private final String prefix;
-
-        Kind(String prefix) {
-            this.prefix = prefix;
-        }
+    public Option clone() {
+        return new Option(new HashSet<>(displays), type, required, description, managementName);
     }
 
     public enum ArgType {
@@ -143,5 +94,18 @@ public final class Option {
         INTEGER,
         DOUBLE,
         BOOLEAN,
+    }
+
+    /**
+     * {@link Option}のテスト用クラス。コンストラクタが{@code private}で、テストできないため、テスト時にはこれを使う。
+     */
+    static final class TestOption extends Option {
+        TestOption(@NonNull Set<OptionDisplay> displays,
+                   @NonNull ArgType type,
+                   boolean required,
+                   String description,
+                   @NonNull String managementName) {
+            super(displays, type, required, description, managementName);
+        }
     }
 }
