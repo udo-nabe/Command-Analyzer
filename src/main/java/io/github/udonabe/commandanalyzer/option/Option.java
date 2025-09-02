@@ -84,6 +84,18 @@ public sealed class Option implements Cloneable {
     }
 
     @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Option{");
+        sb.append("displays=").append(displays);
+        sb.append(", type=").append(type);
+        sb.append(", required=").append(required);
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", managementName='").append(managementName).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
     public Option clone() {
         return new Option(new HashSet<>(displays), type, required, description, managementName);
     }
