@@ -13,6 +13,7 @@ import lombok.NonNull;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * コマンドのオプションを表すクラス。
@@ -36,6 +37,19 @@ public sealed class Option implements Cloneable {
         this.managementName = managementName;
     }
 
+    public static Option subCommand(Set<String> displays, String description, String managementName) {
+        Set<OptionDisplay> converted = displays.stream()
+                .map(t -> new OptionDisplay(OptionDisplay.PrefixKind.SUBCOMMAND, t))
+                .collect(Collectors.toUnmodifiableSet());
+        return new Option(
+                converted,
+                Option.ArgType.NONE,
+                true,
+                description,
+                managementName
+        );
+    }
+
     /**
      * 文字列が自身のプレフィックス+内容(namesの要素一つ一つ)と等価か調べる。
      *
@@ -47,7 +61,7 @@ public sealed class Option implements Cloneable {
     }
 
     public Set<OptionDisplay> displays() {
-        return displays;
+        return Set.copyOf(displays);
     }
 
     public ArgType type() {
@@ -97,7 +111,7 @@ public sealed class Option implements Cloneable {
 
     @Override
     public Option clone() {
-        return new Option(new HashSet<>(displays), type, required, description, managementName);
+        return new Option(Set.copyOf(displays), type, required, description, managementName);
     }
 
     public enum ArgType {
