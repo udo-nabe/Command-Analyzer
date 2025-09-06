@@ -21,13 +21,13 @@ class OptionTest {
         Option opt = new Option.TestOption(
                 Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                         new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
-                Option.ArgType.NONE,
+                ArgType.NONE,
                 true,
                 "This is a test option.",
                 "test-option");
         assertEquals(Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                 new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")), opt.displays());
-        assertEquals(Option.ArgType.NONE, opt.type());
+        assertEquals(ArgType.NONE, opt.type());
         assertTrue(opt.required());
         assertEquals("This is a test option.", opt.description());
         assertEquals("test-option", opt.managementName());
@@ -38,14 +38,14 @@ class OptionTest {
         Option opt = new Option.TestOption(
                 Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                         new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
-                Option.ArgType.NONE,
+                ArgType.NONE,
                 true,
                 "This is a test option.",
                 "test-option");
         Option equal = new Option.TestOption(
                 Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                         new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
-                Option.ArgType.NONE,
+                ArgType.NONE,
                 true,
                 "This is a test option.",
                 "test-option");
@@ -57,14 +57,14 @@ class OptionTest {
         Option opt = new Option.TestOption(
                 Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                         new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
-                Option.ArgType.NONE,
+                ArgType.NONE,
                 true,
                 "This is a test option.",
                 "test-option");
         Option equal = new Option.TestOption(
                 Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                         new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
-                Option.ArgType.NONE,
+                ArgType.NONE,
                 true,
                 "This is a test option.",
                 "test-option");
@@ -76,7 +76,7 @@ class OptionTest {
         Option opt = new Option.TestOption(
                 Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                         new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
-                Option.ArgType.NONE,
+                ArgType.NONE,
                 true,
                 "This is a test option.",
                 "test-option");
@@ -84,7 +84,7 @@ class OptionTest {
         final StringBuilder sb = new StringBuilder("Option{");
         sb.append("displays=").append(Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                 new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")));
-        sb.append(", type=").append(Option.ArgType.NONE);
+        sb.append(", type=").append(ArgType.NONE);
         sb.append(", required=").append(true);
         sb.append(", description='").append("This is a test option.").append('\'');
         sb.append(", managementName='").append("test-option").append('\'');
@@ -98,7 +98,7 @@ class OptionTest {
         Option opt = new Option.TestOption(
                 Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                         new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
-                Option.ArgType.NONE,
+                ArgType.NONE,
                 true,
                 "This is a test option.",
                 "test-option");

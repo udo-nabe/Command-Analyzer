@@ -11,11 +11,13 @@ package io.github.udonabe.commandanalyzer.parser;
 import io.github.udonabe.commandanalyzer.OptionParseException;
 import io.github.udonabe.commandanalyzer.ParseResult;
 import io.github.udonabe.commandanalyzer.option.Option;
+import io.github.udonabe.commandanalyzer.option.OptionDisplay;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Parsers {
     public static Parser subCommand = (options, cmd, it) -> {
@@ -33,5 +35,24 @@ public class Parsers {
         result.put(matched.get().managementName(), ParseResult.builder().rSubCommand(cmd).build());
 
         return result;
+    };
+
+    public static Parser argument = (options, cmd, it) -> {
+        Map<String, ParseResult> result = new HashMap<>();
+        result.put(options.getFirst().managementName(), options.getFirst().type().parse(it));
+        return result;
+    };
+
+    public static Parser option = (options, cmd, it) -> {
+        Optional<Option> matched = Parser.match(options, cmd);
+        if (matched.isEmpty()) throw new OptionParseException("不明なオプション:" + cmd);
+
+        try {
+            return new HashMap<>(argument.parse(options, cmd, it));
+        } catch (NoSuchElementException e) {
+            throw new OptionParseException("引数がありません。 オプション: " + matched.get().getFullDisplays(), e);
+        } catch (RuntimeException e) {
+            throw new OptionParseException("引数の型が異なります。 オプション: " + matched.get().getFullDisplays(), e);
+        }
     };
 }

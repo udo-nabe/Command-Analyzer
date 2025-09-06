@@ -8,11 +8,13 @@
 
 package io.github.udonabe.commandanalyzer.option;
 
+import io.github.udonabe.commandanalyzer.OptionParseException;
+import io.github.udonabe.commandanalyzer.ParseResult;
+import io.github.udonabe.commandanalyzer.parser.Parser;
+import io.github.udonabe.commandanalyzer.parser.Parsers;
 import lombok.NonNull;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,8 +45,18 @@ public sealed class Option implements Cloneable {
                 .collect(Collectors.toUnmodifiableSet());
         return new Option(
                 converted,
-                Option.ArgType.NONE,
+                ArgType.NONE,
                 true,
+                description,
+                managementName
+        );
+    }
+
+    public static Option normalOption(Set<OptionDisplay> displays, ArgType arg, boolean required, String description, String managementName) {
+        return new Option(
+                displays,
+                arg,
+                required,
                 description,
                 managementName
         );
@@ -80,6 +92,13 @@ public sealed class Option implements Cloneable {
         return managementName;
     }
 
+    public Set<String> getFullDisplays() {
+        return this.displays()
+                .stream()
+                .map(OptionDisplay::getFullDisplay)
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (!(o instanceof Option option)) return false;
@@ -112,14 +131,6 @@ public sealed class Option implements Cloneable {
     @Override
     public Option clone() {
         return new Option(Set.copyOf(displays), type, required, description, managementName);
-    }
-
-    public enum ArgType {
-        NONE,
-        STRING,
-        INTEGER,
-        DOUBLE,
-        BOOLEAN,
     }
 
     /**
