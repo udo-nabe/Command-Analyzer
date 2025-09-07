@@ -58,6 +58,16 @@ public sealed class Option implements Cloneable {
         );
     }
 
+    private static Option argument(ArgType arg, String description, String managementName) {
+        return new Option(
+                Set.of(),
+                arg,
+                true,
+                description,
+                managementName
+        );
+    }
+
     /**
      * 文字列が自身のプレフィックス+内容(namesの要素一つ一つ)と等価か調べる。
      *
