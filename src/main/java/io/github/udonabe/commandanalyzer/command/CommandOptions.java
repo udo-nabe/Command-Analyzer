@@ -8,8 +8,11 @@
 
 package io.github.udonabe.commandanalyzer.command;
 
+import io.github.udonabe.commandanalyzer.OptionParseException;
+import io.github.udonabe.commandanalyzer.ParseResult;
 import io.github.udonabe.commandanalyzer.option.Option;
 import io.github.udonabe.commandanalyzer.option.OptionDisplay;
+import io.github.udonabe.commandanalyzer.parser.InnerParser;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +39,10 @@ public class CommandOptions {
      * 位置引数を格納する。これは、順序が重要なため、{@link #normalOptions}と違い、{@link List}にしています。
      */
     private final List<Option> positionalArgs;
+
+    public Map<String, ParseResult> parse(List<String> commands) throws OptionParseException {
+        return InnerParser.parse(subCommand, normalOptions, positionalArgs, commands);
+    }
 
     public Option getSubCommand() {
         return subCommand == null ? null : subCommand.clone();
