@@ -15,7 +15,7 @@ import io.github.udonabe.commandanalyzer.option.Option;
 import java.util.*;
 
 @FunctionalInterface
-public interface Parser {
+interface Parser {
     Map<String, ParseResult> parse(List<Option> options, String cmd, Iterator<String> it) throws OptionParseException;
 
     static Optional<Option> match(Collection<Option> commands, String cmd) {

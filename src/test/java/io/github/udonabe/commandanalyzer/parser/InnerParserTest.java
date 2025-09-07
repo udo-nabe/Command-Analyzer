@@ -35,8 +35,7 @@ public class InnerParserTest {
     }
 
     @Test
-    void testNormalOption() throws OptionParseException {
-        // 正常系
+    void testNormalOption_normal() throws OptionParseException {
         CommandOptions options = CommandOptions.generator(null)
                 .option(Option.normalOption(
                         Set.of(
@@ -50,10 +49,67 @@ public class InnerParserTest {
                 .build();
         var result = InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of("-e", "This is a test"));
         assertEquals("This is a test", result.get("example").rString());
+    }
 
-        //異常系: 想定された引数が無い場合、エラーとなるか
+    @Test
+    void testNormalOption_abnormality_arg() throws OptionParseException {
+        CommandOptions options = CommandOptions.generator(null)
+                .option(Option.normalOption(
+                        Set.of(
+                                new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e")
+                        ),
+                        ArgType.INTEGER,
+                        false,
+                        "Test String Option",
+                        "example"
+                ))
+                .build();
+        //引数が無い場合
         assertThrows(OptionParseException.class, () -> {
-            var res = InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of("-e"));
+            InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of("-e"));
+        });
+
+        //型が異なる場合
+        assertThrows(OptionParseException.class, () -> {
+            InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of("-e", "invalid"));
+        });
+    }
+
+    @Test
+    void testNormalOption_unknown() {
+        CommandOptions options = CommandOptions.generator(null)
+                .option(Option.normalOption(
+                        Set.of(
+                                new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e")
+                        ),
+                        ArgType.NONE,
+                        false,
+                        "Test String Option",
+                        "example"
+                ))
+                .build();
+        //不明な引数がある場合
+        assertThrows(OptionParseException.class, () -> {
+            InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of("--unknown"));
+        });
+    }
+
+    @Test
+    void testPositionalArgument_argument() {
+        CommandOptions options = CommandOptions.generator(null)
+                .option(Option.normalOption(
+                        Set.of(
+                                new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e")
+                        ),
+                        ArgType.NONE,
+                        false,
+                        "Test String Option",
+                        "example"
+                ))
+                .build();
+        //不明な引数がある場合
+        assertThrows(OptionParseException.class, () -> {
+            InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of("--unknown"));
         });
     }
 }

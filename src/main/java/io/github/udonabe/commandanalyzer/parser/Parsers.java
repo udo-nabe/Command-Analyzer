@@ -10,6 +10,7 @@ package io.github.udonabe.commandanalyzer.parser;
 
 import io.github.udonabe.commandanalyzer.OptionParseException;
 import io.github.udonabe.commandanalyzer.ParseResult;
+import io.github.udonabe.commandanalyzer.option.ArgType;
 import io.github.udonabe.commandanalyzer.option.Option;
 import io.github.udonabe.commandanalyzer.option.OptionDisplay;
 
@@ -19,8 +20,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class Parsers {
-    public static Parser subCommand = (options, cmd, it) -> {
+class Parsers {
+    static Parser subCommand = (options, cmd, it) -> {
         // 引数を変更してしまう可能性があるため、コピーする
         Map<String, ParseResult> result = new HashMap<>();
 
@@ -37,18 +38,30 @@ public class Parsers {
         return result;
     };
 
-    public static Parser argument = (options, cmd, it) -> {
+    static Parser argument = (options, cmd, it) -> {
         Map<String, ParseResult> result = new HashMap<>();
         result.put(options.getFirst().managementName(), options.getFirst().type().parse(it));
         return result;
     };
 
-    public static Parser option = (options, cmd, it) -> {
+    static Parser option = (options, cmd, it) -> {
         Optional<Option> matched = Parser.match(options, cmd);
         if (matched.isEmpty()) throw new OptionParseException("不明なオプション:" + cmd);
 
+        if (matched.get().type() == ArgType.NONE) {
+            options.remove(matched.get());
+            return new HashMap<>() {
+                {
+                    put(matched.get().managementName(),
+                            ParseResult.builder().rBoolean(true).build());
+                }
+            };
+        }
+
         try {
-            return new HashMap<>(argument.parse(options, cmd, it));
+            Map<String, ParseResult> result = argument.parse(options, cmd, it);
+            options.remove(matched.get());
+            return result;
         } catch (NoSuchElementException e) {
             throw new OptionParseException("引数がありません。 オプション: " + matched.get().getFullDisplays(), e);
         } catch (RuntimeException e) {

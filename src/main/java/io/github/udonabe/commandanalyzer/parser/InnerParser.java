@@ -10,7 +10,6 @@ package io.github.udonabe.commandanalyzer.parser;
 
 import io.github.udonabe.commandanalyzer.OptionParseException;
 import io.github.udonabe.commandanalyzer.ParseResult;
-import io.github.udonabe.commandanalyzer.option.ArgType;
 import io.github.udonabe.commandanalyzer.option.Option;
 import io.github.udonabe.commandanalyzer.option.OptionDisplay;
 import lombok.NonNull;
@@ -34,39 +33,59 @@ public class InnerParser {
                 .collect(Collectors.toList());
         var positionalArgs = rawPositionalArgs.stream()
                 .map(Option::clone)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
-        CurrentMode mode = currentModeSetUp(subCommand != null, !options.isEmpty(), !positionalArgs.isEmpty(), true);
+        CurrentMode mode = currentModeSetUp(subCommand != null, !options.isEmpty(), !positionalArgs.isEmpty());
+
+        ValidationChecker validation = new ValidationChecker(options, positionalArgs);
+        validation.checkStart();
 
         Iterator<String> it = args.iterator();
 
         while (it.hasNext()) {
             String cmd = it.next();
             Map<String, ParseResult> parsed;
-            switch (mode) {
-                case SUBCOMMAND -> parsed = Parsers.subCommand.parse(Collections.singletonList(subCommand), cmd, it);
-                case NORMAL_OPTION -> parsed = Parsers.argument.parse(options, cmd, it);
-                default -> throw new UnsupportedOperationException("Not implemented.");
+
+            CurrentMode newMode = currentModeUpdate(cmd, mode);
+            if (cmd.equals("--")) continue;
+
+            try {
+                switch (mode) {
+                    case SUBCOMMAND -> parsed = Parsers.subCommand.parse(Collections.singletonList(subCommand), cmd, it);
+                    case NORMAL_OPTION -> parsed = Parsers.option.parse(options, cmd, it);
+                    case POSITIONAL_ARGUMENT -> parsed = Parsers.argument.parse(Collections.singletonList(positionalArgs.removeFirst()), cmd, it);
+                    default -> throw new UnsupportedOperationException("Not implemented.");
+                }
+            } catch (NoSuchElementException e) {
+                throw new OptionParseException("不要な引数があります。");
             }
+
             result.putAll(parsed);
-            mode = currentModeSetUp(false, !options.isEmpty(), !positionalArgs.isEmpty(), false);
-            if (mode == null) {
-                //他に処理対象が無いので、ループを抜けて終了する
-                break;
-            }
+            mode = newMode;
         }
+
+        validation.checkEnd();
+
         return result;
     }
 
     private static CurrentMode currentModeSetUp(boolean subCommandFound,
                                                 boolean normalOptionFound,
-                                                boolean positionalArgumentFound,
-                                                boolean isThrow) {
+                                                boolean positionalArgumentFound) {
         if (subCommandFound) return CurrentMode.SUBCOMMAND;
         if (normalOptionFound) return CurrentMode.NORMAL_OPTION;
         if (positionalArgumentFound) return CurrentMode.POSITIONAL_ARGUMENT;
-        if (isThrow) throw new IllegalStateException("パース開始位置を見つけられませんでした。全ての要素が空です。");
-        return null;
+        throw new IllegalStateException("パース開始位置を見つけられませんでした。全ての要素が空です。");
+    }
+
+    private static CurrentMode currentModeUpdate(String cmd, CurrentMode mode) {
+        //プレフィックスがあるかチェックする
+        Set<String> prefixes = OptionDisplay.PrefixKind.getPrefixes();
+
+        if (mode == CurrentMode.POSITIONAL_ARGUMENT) return CurrentMode.POSITIONAL_ARGUMENT;
+        if (prefixes.stream().noneMatch(cmd::equals)) return CurrentMode.POSITIONAL_ARGUMENT;
+        if (cmd.equals("--")) return CurrentMode.POSITIONAL_ARGUMENT;
+        return CurrentMode.NORMAL_OPTION;
     }
 
     private enum CurrentMode {
