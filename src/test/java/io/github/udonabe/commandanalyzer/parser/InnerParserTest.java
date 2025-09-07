@@ -95,7 +95,7 @@ public class InnerParserTest {
     }
 
     @Test
-    void testPositionalArgument_argument() {
+    void testPositionalArgument_argument() throws OptionParseException {
         CommandOptions options = CommandOptions.generator(null)
                 .option(Option.normalOption(
                         Set.of(
@@ -106,10 +106,14 @@ public class InnerParserTest {
                         "Test String Option",
                         "example"
                 ))
+                .argument(Option.argument(
+                        ArgType.STRING,
+                        "Test Positional Argument",
+                        "test-pos-arg"
+                ))
                 .build();
-        //不明な引数がある場合
-        assertThrows(OptionParseException.class, () -> {
-            InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of("--unknown"));
-        });
+        var res = options.parse(List.of("-e", "TEST"));
+        assertTrue(res.get("example").rBoolean());
+        assertEquals("TEST", res.get("test-pos-arg").rString());
     }
 }

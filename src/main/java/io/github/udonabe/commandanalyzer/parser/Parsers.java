@@ -40,7 +40,11 @@ class Parsers {
 
     static Parser argument = (options, cmd, it) -> {
         Map<String, ParseResult> result = new HashMap<>();
-        result.put(options.getFirst().managementName(), options.getFirst().type().parse(it));
+        try {
+            result.put(options.getFirst().managementName(), options.getFirst().type().parse(cmd));
+        } catch (OptionParseException e) {
+            throw new OptionParseException("引数にエラーがあります。入力値: " + cmd + ", 管理名: " + options.getFirst().managementName(), e);
+        }
         return result;
     };
 
@@ -59,7 +63,7 @@ class Parsers {
         }
 
         try {
-            Map<String, ParseResult> result = argument.parse(options, cmd, it);
+            Map<String, ParseResult> result = argument.parse(options, it.next(), it);
             options.remove(matched.get());
             return result;
         } catch (NoSuchElementException e) {

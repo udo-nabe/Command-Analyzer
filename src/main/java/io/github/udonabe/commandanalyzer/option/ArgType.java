@@ -16,20 +16,20 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public enum ArgType {
-    NONE(it -> ParseResult.builder().rBoolean(true).build()),
-    STRING(it -> ParseResult.builder().rString(it.next()).build()),
-    INTEGER(it -> ParseResult.builder().rInt(Integer.parseInt(it.next())).build()),
-    DOUBLE(it -> ParseResult.builder().rDouble(Double.parseDouble(it.next())).build()),
-    BOOLEAN(it -> ParseResult.builder().rBoolean(Boolean.parseBoolean(it.next())).build());
-    private final Function<Iterator<String>, ParseResult> parser;
+    NONE(arg -> ParseResult.builder().rBoolean(true).build()),
+    STRING(arg -> ParseResult.builder().rString(arg).build()),
+    INTEGER(arg -> ParseResult.builder().rInt(Integer.parseInt(arg)).build()),
+    DOUBLE(arg -> ParseResult.builder().rDouble(Double.parseDouble(arg)).build()),
+    BOOLEAN(arg -> ParseResult.builder().rBoolean(Boolean.parseBoolean(arg)).build());
+    private final Function<String, ParseResult> parser;
 
-    ArgType(Function<Iterator<String>, ParseResult> parser) {
+    ArgType(Function<String, ParseResult> parser) {
         this.parser = parser;
     }
 
-    public ParseResult parse(Iterator<String> it) throws OptionParseException {
+    public ParseResult parse(String arg) throws OptionParseException {
         try {
-            return this.parser.apply(it);
+            return this.parser.apply(arg);
         } catch (RuntimeException e) {
             throw new OptionParseException("引数が不足しているか、型が異なります。期待型: " + this, e);
         }
