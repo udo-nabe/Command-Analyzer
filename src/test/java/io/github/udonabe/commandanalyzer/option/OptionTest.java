@@ -24,7 +24,8 @@ class OptionTest {
                 ArgType.NONE,
                 true,
                 "This is a test option.",
-                "test-option");
+                "test-option",
+                false);
         assertEquals(Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                 new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")), opt.displays());
         assertEquals(ArgType.NONE, opt.type());
@@ -41,14 +42,16 @@ class OptionTest {
                 ArgType.NONE,
                 true,
                 "This is a test option.",
-                "test-option");
+                "test-option",
+                false);
         Option equal = new Option.TestOption(
                 Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                         new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
                 ArgType.NONE,
                 true,
                 "This is a test option.",
-                "test-option");
+                "test-option",
+                false);
         assertEquals(opt, equal);
     }
 
@@ -60,14 +63,16 @@ class OptionTest {
                 ArgType.NONE,
                 true,
                 "This is a test option.",
-                "test-option");
+                "test-option",
+                false);
         Option equal = new Option.TestOption(
                 Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
                         new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
                 ArgType.NONE,
                 true,
                 "This is a test option.",
-                "test-option");
+                "test-option",
+                false);
         assertEquals(opt.hashCode(), equal.hashCode());
     }
 
@@ -79,7 +84,8 @@ class OptionTest {
                 ArgType.NONE,
                 true,
                 "This is a test option.",
-                "test-option");
+                "test-option",
+                false);
 
         final StringBuilder sb = new StringBuilder("Option{");
         sb.append("displays=").append(Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
@@ -88,6 +94,7 @@ class OptionTest {
         sb.append(", required=").append(true);
         sb.append(", description='").append("This is a test option.").append('\'');
         sb.append(", managementName='").append("test-option").append('\'');
+        sb.append(", exclusive=").append(false);
         sb.append('}');
 
         assertEquals(sb.toString(), opt.toString());
@@ -101,7 +108,8 @@ class OptionTest {
                 ArgType.NONE,
                 true,
                 "This is a test option.",
-                "test-option");
+                "test-option",
+                false);
         Option cloned = opt.clone();
         assertEquals(opt, cloned);
         assertNotSame(opt, cloned);

@@ -22,17 +22,20 @@ public sealed class Option implements Cloneable {
     private final boolean required;
     private final String description;
     private final String managementName;
+    private final boolean exclusive;
 
     private Option(@NonNull Set<OptionDisplay> displays,
                    @NonNull ArgType type,
                    boolean required,
                    String description,
-                   @NonNull String managementName) {
+                   @NonNull String managementName,
+                   boolean exclusive) {
         this.displays = displays;
         this.type = type;
         this.required = required;
         this.description = description;
         this.managementName = managementName;
+        this.exclusive = exclusive;
     }
 
     public static Option subCommand(Set<String> displays, String description, String managementName) {
@@ -44,7 +47,8 @@ public sealed class Option implements Cloneable {
                 ArgType.NONE,
                 true,
                 description,
-                managementName
+                managementName,
+                true
         );
     }
 
@@ -54,17 +58,30 @@ public sealed class Option implements Cloneable {
                 arg,
                 required,
                 description,
-                managementName
+                managementName,
+                false
         );
     }
 
-    private static Option argument(ArgType arg, String description, String managementName) {
+    public static Option argument(ArgType arg, String description, String managementName) {
         return new Option(
                 Set.of(),
                 arg,
                 true,
                 description,
-                managementName
+                managementName,
+                false
+        );
+    }
+
+    public Option toExclusive() {
+        return new Option(
+                displays,
+                type,
+                true,
+                description,
+                managementName,
+                true
         );
     }
 
@@ -109,7 +126,7 @@ public sealed class Option implements Cloneable {
     public final boolean equals(Object o) {
         if (!(o instanceof Option option)) return false;
 
-        return required == option.required && displays.equals(option.displays) && type == option.type && Objects.equals(description, option.description) && managementName.equals(option.managementName);
+        return required == option.required && exclusive == option.exclusive && displays.equals(option.displays) && type == option.type && Objects.equals(description, option.description) && managementName.equals(option.managementName);
     }
 
     @Override
@@ -119,6 +136,7 @@ public sealed class Option implements Cloneable {
         result = 31 * result + Boolean.hashCode(required);
         result = 31 * result + Objects.hashCode(description);
         result = 31 * result + managementName.hashCode();
+        result = 31 * result + Boolean.hashCode(exclusive);
         return result;
     }
 
@@ -130,13 +148,14 @@ public sealed class Option implements Cloneable {
         sb.append(", required=").append(required);
         sb.append(", description='").append(description).append('\'');
         sb.append(", managementName='").append(managementName).append('\'');
+        sb.append(", exclusive=").append(exclusive);
         sb.append('}');
         return sb.toString();
     }
 
     @Override
     public Option clone() {
-        return new Option(Set.copyOf(displays), type, required, description, managementName);
+        return new Option(Set.copyOf(displays), type, required, description, managementName, exclusive);
     }
 
     /**
@@ -147,8 +166,9 @@ public sealed class Option implements Cloneable {
                    @NonNull ArgType type,
                    boolean required,
                    String description,
-                   @NonNull String managementName) {
-            super(displays, type, required, description, managementName);
+                   @NonNull String managementName,
+                   boolean exclusive) {
+            super(displays, type, required, description, managementName, exclusive);
         }
     }
 }

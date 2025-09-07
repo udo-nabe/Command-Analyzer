@@ -77,10 +77,10 @@ public class CommandOptions {
 
 
         private Generator(Option subCommand) {
-            if (subCommand.displays()
+            if (subCommand != null &&
+                subCommand.displays()
                     .stream()
-                    .anyMatch(t -> t.prefix() == OptionDisplay.PrefixKind.SUBCOMMAND ||
-                                   t.prefix() == OptionDisplay.PrefixKind.ARGUMENT)) {
+                    .anyMatch(t -> t.prefix() != OptionDisplay.PrefixKind.SUBCOMMAND)) {
                 throw new IllegalArgumentException("引数には、サブコマンドを指定してください。");
             }
 
