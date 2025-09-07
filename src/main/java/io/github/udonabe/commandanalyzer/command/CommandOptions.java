@@ -70,6 +70,13 @@ public class CommandOptions {
 
 
         private Generator(Option subCommand) {
+            if (subCommand.displays()
+                    .stream()
+                    .anyMatch(t -> t.prefix() == OptionDisplay.PrefixKind.SUBCOMMAND ||
+                                   t.prefix() == OptionDisplay.PrefixKind.ARGUMENT)) {
+                throw new IllegalArgumentException("引数には、サブコマンドを指定してください。");
+            }
+
             this.subCommand = subCommand;
             this.normalOptions = new HashSet<>();
             this.positionalArgs = new ArrayList<>();
@@ -83,6 +90,13 @@ public class CommandOptions {
         public Generator option(@NonNull Option add) {
             //引数をチェック
             checkNonAdded(add.managementName(), add.displays().stream().map(OptionDisplay::getFullDisplay).collect(Collectors.toUnmodifiableSet()));
+
+            if (add.displays()
+                    .stream()
+                    .anyMatch(t -> t.prefix() == OptionDisplay.PrefixKind.SUBCOMMAND ||
+                                   t.prefix() == OptionDisplay.PrefixKind.ARGUMENT)) {
+                throw new IllegalArgumentException("option()メソッドでは、サブコマンドと位置引数は追加できません。");
+            }
 
             normalOptions.add(add);
             return this;
