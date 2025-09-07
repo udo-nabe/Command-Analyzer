@@ -115,6 +115,10 @@ public sealed class Option implements Cloneable {
         return managementName;
     }
 
+    public boolean exclusive() {
+        return exclusive;
+    }
+
     public Set<String> getFullDisplays() {
         return this.displays()
                 .stream()
