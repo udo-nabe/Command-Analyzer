@@ -10,6 +10,10 @@ package io.github.udonabe.commandanalyzer.option;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public record OptionDisplay(PrefixKind prefix, String display) {
     public String getFullDisplay() {
         return prefix().prefix + display;
@@ -26,6 +30,17 @@ public record OptionDisplay(PrefixKind prefix, String display) {
 
         PrefixKind(String prefix) {
             this.prefix = prefix;
+        }
+
+        /**
+         *
+         * @return プレフィックス一覧
+         */
+        public static Set<String> getPrefixes() {
+            return Arrays.stream(OptionDisplay.PrefixKind.values())
+                    .map(OptionDisplay.PrefixKind::getPrefix)
+                    .filter(t -> !t.isEmpty())
+                    .collect(Collectors.toUnmodifiableSet());
         }
     }
 }
