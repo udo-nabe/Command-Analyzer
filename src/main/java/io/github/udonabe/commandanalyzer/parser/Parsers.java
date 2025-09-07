@@ -33,7 +33,7 @@ class Parsers {
         if (matched.isEmpty())
             throw new OptionParseException("サブコマンドがありません。入力候補: " + option.displays());
 
-        result.put(matched.get().managementName(), ParseResult.builder().rSubCommand(cmd).build());
+        result.put(matched.get().managementName(), ParseResult.builder().present(true).rSubCommand(cmd).build());
 
         return result;
     };
@@ -57,7 +57,7 @@ class Parsers {
             return new HashMap<>() {
                 {
                     put(matched.get().managementName(),
-                            ParseResult.builder().rBoolean(true).build());
+                            ParseResult.builder().present(true).rBoolean(true).build());
                 }
             };
         }

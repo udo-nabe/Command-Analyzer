@@ -16,11 +16,11 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public enum ArgType {
-    NONE(arg -> ParseResult.builder().rBoolean(true).build()),
-    STRING(arg -> ParseResult.builder().rString(arg).build()),
-    INTEGER(arg -> ParseResult.builder().rInt(Integer.parseInt(arg)).build()),
-    DOUBLE(arg -> ParseResult.builder().rDouble(Double.parseDouble(arg)).build()),
-    BOOLEAN(arg -> ParseResult.builder().rBoolean(Boolean.parseBoolean(arg)).build());
+    NONE(arg -> ParseResult.builder().present(true).rBoolean(true).build()),
+    STRING(arg -> ParseResult.builder().present(true).rString(arg).build()),
+    INTEGER(arg -> ParseResult.builder().present(true).rInt(Integer.parseInt(arg)).build()),
+    DOUBLE(arg -> ParseResult.builder().present(true).rDouble(Double.parseDouble(arg)).build()),
+    BOOLEAN(arg -> ParseResult.builder().present(true).rBoolean(Boolean.parseBoolean(arg)).build());
     private final Function<String, ParseResult> parser;
 
     ArgType(Function<String, ParseResult> parser) {

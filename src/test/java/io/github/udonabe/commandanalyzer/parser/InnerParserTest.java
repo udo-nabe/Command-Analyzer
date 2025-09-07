@@ -13,6 +13,7 @@ import io.github.udonabe.commandanalyzer.option.ArgType;
 import io.github.udonabe.commandanalyzer.option.Option;
 import io.github.udonabe.commandanalyzer.option.OptionDisplay;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.util.List;
 import java.util.Set;
@@ -49,6 +50,29 @@ public class InnerParserTest {
                 .build();
         var result = InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of("-e", "This is a test"));
         assertEquals("This is a test", result.get("example").rString());
+    }
+
+    @Test
+    void testNormalOption_normal_present() throws OptionParseException {
+        //オプションが無い場合、正しくpresent=falseで追加されるか
+        CommandOptions options = CommandOptions.generator(null)
+                .option(Option.normalOption(
+                        Set.of(
+                                new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e")
+                        ),
+                        ArgType.NONE,
+                        false,
+                        "Test String Option",
+                        "example"
+                ))
+                .build();
+        var result = InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of());
+        assertFalse(result.get("example").present());
+
+        //ある場合、present=trueになるか
+        result = InnerParser.parse(options.getSubCommand(), options.getNormalOptions(), options.getPositionalArgs(), List.of("-e"));
+        assertTrue(result.get("example").present());
+        assertTrue(result.get("example").rBoolean());
     }
 
     @Test
@@ -115,5 +139,14 @@ public class InnerParserTest {
         var res = options.parse(List.of("-e", "TEST"));
         assertTrue(res.get("example").rBoolean());
         assertEquals("TEST", res.get("test-pos-arg").rString());
+
+        //引数にプレフィックスがある場合、エラーとなるか
+        assertThrows(OptionParseException.class, () -> {
+            options.parse(List.of("-e", "--TEST"));
+        });
+
+        res = options.parse(List.of("-e", "--", "--TEST"));
+        assertTrue(res.get("example").rBoolean());
+        assertEquals("--TEST", res.get("test-pos-arg").rString());
     }
 }

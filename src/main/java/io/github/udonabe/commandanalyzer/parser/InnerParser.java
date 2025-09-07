@@ -42,12 +42,15 @@ public class InnerParser {
 
         Iterator<String> it = args.iterator();
 
+        boolean subCommandConsumed = (subCommand == null);
         while (it.hasNext()) {
             String cmd = it.next();
             Map<String, ParseResult> parsed;
 
-            CurrentMode newMode = currentModeUpdate(cmd, mode);
+            mode = currentModeUpdate(cmd, mode, subCommandConsumed);
             if (cmd.equals("--")) continue;
+
+            if (!subCommandConsumed) subCommandConsumed = true;
 
             try {
                 switch (mode) {
@@ -61,10 +64,13 @@ public class InnerParser {
             }
 
             result.putAll(parsed);
-            mode = newMode;
         }
 
         validation.checkEnd();
+
+        for (Option opt : options) {
+            result.put(opt.managementName(), ParseResult.builder().build());
+        }
 
         return result;
     }
@@ -78,12 +84,13 @@ public class InnerParser {
         throw new IllegalStateException("パース開始位置を見つけられませんでした。全ての要素が空です。");
     }
 
-    private static CurrentMode currentModeUpdate(String cmd, CurrentMode mode) {
+    private static CurrentMode currentModeUpdate(String cmd, CurrentMode mode, boolean subCommandConsumed) {
         //プレフィックスがあるかチェックする
         Set<String> prefixes = OptionDisplay.PrefixKind.getPrefixes();
 
+        if (!subCommandConsumed) return CurrentMode.SUBCOMMAND;
         if (mode == CurrentMode.POSITIONAL_ARGUMENT) return CurrentMode.POSITIONAL_ARGUMENT;
-        if (prefixes.stream().noneMatch(cmd::equals)) return CurrentMode.POSITIONAL_ARGUMENT;
+        if (prefixes.stream().noneMatch(cmd::startsWith)) return CurrentMode.POSITIONAL_ARGUMENT;
         if (cmd.equals("--")) return CurrentMode.POSITIONAL_ARGUMENT;
         return CurrentMode.NORMAL_OPTION;
     }
