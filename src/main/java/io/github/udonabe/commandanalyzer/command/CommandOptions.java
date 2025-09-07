@@ -102,6 +102,20 @@ public class CommandOptions {
             return this;
         }
 
+        public Generator argument(@NonNull Option add) {
+            //引数をチェック
+            checkNonAdded(add.managementName(), add.displays().stream().map(OptionDisplay::getFullDisplay).collect(Collectors.toUnmodifiableSet()));
+
+            if (add.displays()
+                    .stream()
+                    .anyMatch(t -> t.prefix() != OptionDisplay.PrefixKind.ARGUMENT)) {
+                throw new IllegalArgumentException("argument()メソッドでは、位置引数以外は追加できません。");
+            }
+
+            positionalArgs.add(add);
+            return this;
+        }
+
         private void checkNonAdded(String managementName, Set<String> displays) {
             if (!names.add(managementName)) throw new IllegalArgumentException("既に同じ管理名(managementName)のオプションが追加されています。");
             for (String display : displays) {
