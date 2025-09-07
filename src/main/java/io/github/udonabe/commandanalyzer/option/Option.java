@@ -53,6 +53,11 @@ public sealed class Option implements Cloneable {
     }
 
     public static Option normalOption(Set<OptionDisplay> displays, ArgType arg, boolean required, String description, String managementName) {
+        if (displays.stream().anyMatch(t -> t.prefix() != OptionDisplay.PrefixKind.SHORT_OPTION &&
+                                            t.prefix() != OptionDisplay.PrefixKind.LONG_OPTION &&
+                                            t.prefix() != OptionDisplay.PrefixKind.SLASH_OPTION)) {
+            throw new IllegalArgumentException("normalOption()では、ショートオプション・ロングオプション・スラッシュオプション以外生成できません。");
+        }
         return new Option(
                 displays,
                 arg,
@@ -75,6 +80,7 @@ public sealed class Option implements Cloneable {
     }
 
     public Option toExclusive() {
+        if (type != ArgType.NONE) throw new IllegalStateException("typeがNONE以外のOptionは、排他にできません。");
         return new Option(
                 displays,
                 type,
