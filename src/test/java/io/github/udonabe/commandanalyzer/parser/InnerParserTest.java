@@ -100,6 +100,45 @@ public class InnerParserTest {
     }
 
     @Test
+    void testNormalOption_exclusive() throws OptionParseException {
+        CommandOptions options = CommandOptions.generator(null)
+                .option(Option.normalOption(
+                        Set.of(
+                                new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                                new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "t")
+                        ),
+                        ArgType.NONE,
+                        false,
+                        "Test String Option",
+                        "example"
+                ).toExclusive())
+                .build();
+        var res = options.parse(List.of("-e"));
+        assertEquals("e", res.get("example").rWhich());
+        res = options.parse(List.of("-t"));
+        assertEquals("t", res.get("example").rWhich());
+    }
+
+    @Test
+    void testNormalOption_exclusive_multi() throws OptionParseException {
+        CommandOptions options = CommandOptions.generator(null)
+                .option(Option.normalOption(
+                        Set.of(
+                                new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                                new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "t")
+                        ),
+                        ArgType.NONE,
+                        false,
+                        "Test String Option",
+                        "example"
+                ).toExclusive())
+                .build();
+        assertThrows(OptionParseException.class, () -> {
+            options.parse(List.of("-e", "-t"));
+        });
+    }
+
+    @Test
     void testNormalOption_unknown() {
         CommandOptions options = CommandOptions.generator(null)
                 .option(Option.normalOption(

@@ -14,11 +14,7 @@ import io.github.udonabe.commandanalyzer.option.ArgType;
 import io.github.udonabe.commandanalyzer.option.Option;
 import io.github.udonabe.commandanalyzer.option.OptionDisplay;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 class Parsers {
     static Parser subCommand = (options, cmd, it) -> {
@@ -48,12 +44,34 @@ class Parsers {
         return result;
     };
 
+    private static final Set<String> exclusiveDisplayNames = new HashSet<>();
+
     static Parser option = (options, cmd, it) -> {
         Optional<Option> matched = Parser.match(options, cmd);
-        if (matched.isEmpty()) throw new OptionParseException("不明なオプション:" + cmd);
+        if (matched.isEmpty()) {
+            if (exclusiveDisplayNames.contains(cmd)) {
+                throw new OptionParseException("排他グループが重複指定されています: " + cmd);
+            }
+            throw new OptionParseException("不明なオプション:" + cmd);
+        }
 
         if (matched.get().type() == ArgType.NONE) {
             options.remove(matched.get());
+            if (matched.get().exclusive()) {
+                String matchedDisplay = matched.get().displays()
+                        .stream()
+                        .filter(t -> (t.prefix().getPrefix() + t.display()).equals(cmd))
+                        .map(OptionDisplay::display)
+                        .findFirst()
+                        .orElseThrow(() -> new AssertionError("排他グループのマッチ処理が間違っている可能性があります。"));
+                exclusiveDisplayNames.addAll(matched.get().getFullDisplays());
+                return new HashMap<>() {
+                    {
+                        put(matched.get().managementName(),
+                                ParseResult.builder().rWhich(matchedDisplay).build());
+                    }
+                };
+            }
             return new HashMap<>() {
                 {
                     put(matched.get().managementName(),
