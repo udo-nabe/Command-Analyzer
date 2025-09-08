@@ -8,89 +8,177 @@
 
 package io.github.udonabe.commandanalyzer.option;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * コマンドのオプションを表すクラス。
- * 一般的には、このクラスを直接インスタンス化することはせず、
- * 子クラスをインスタンス化した方が意図が分かりやすくなります。
- * ただし、独自の接頭辞を使う場合は、このクラスをインスタンス化するか、
- * このクラスを拡張してください。
  */
+public sealed class Option implements Cloneable {
+    private final Set<OptionDisplay> displays;
+    private final ArgType type;
+    private final boolean required;
+    private final String description;
+    private final String managementName;
+    private final boolean exclusive;
 
-@Getter
-@EqualsAndHashCode
-@ToString
-public sealed class Option permits ArgumentOption, LongOption, ShortOption, SlashOption, SubCommandOption {
-    /**
-     * オプションの接頭辞。空にすることもできます。
-     * 注意: このクラスを直接インスタンス化しても、子クラス特有の機能(ショートオプションをまとめられるなど)は付与されません。
-     */
-    private final String prefix;
-    /**
-     * オプションの表示名。
-     * 表示名は空にすることができます。
-     * 空にした場合、ArgTypeをNONEに設定することはできません。
-     */
-    private final String displayName;
-    /**
-     * 引数の種別。詳細は{@link ArgType}をご覧ください。
-     */
-    private final ArgType argType;
+    private Option(@NonNull Set<OptionDisplay> displays,
+                   @NonNull ArgType type,
+                   boolean required,
+                   String description,
+                   @NonNull String managementName,
+                   boolean exclusive) {
+        this.displays = displays;
+        this.type = type;
+        this.required = required;
+        this.description = description;
+        this.managementName = managementName;
+        this.exclusive = exclusive;
+    }
 
-    /**
-     * 標準のコンストラクタ。
-     * @param prefix 接頭辞。({@link #prefix})
-     * @param argType 引数の種別。({@link #argType})
-     */
-    public Option(@NonNull String prefix, String displayName, @NonNull ArgType argType) {
-        //引数のチェック
-        if (displayName == null || displayName.isEmpty()) {
-            if (!(this instanceof SubCommandOption || this instanceof ArgumentOption)) {
-                throw new IllegalArgumentException("Argument displayName cannot be null or empty");
-            }
+    public static Option subCommand(Set<String> displays, String description, String managementName) {
+        Set<OptionDisplay> converted = displays.stream()
+                .map(t -> new OptionDisplay(OptionDisplay.PrefixKind.SUBCOMMAND, t))
+                .collect(Collectors.toUnmodifiableSet());
+        return new Option(
+                converted,
+                ArgType.NONE,
+                true,
+                description,
+                managementName,
+                true
+        );
+    }
+
+    public static Option normalOption(Set<OptionDisplay> displays, ArgType arg, boolean required, String description, String managementName) {
+        if (displays.stream().anyMatch(t -> t.prefix() != OptionDisplay.PrefixKind.SHORT_OPTION &&
+                                            t.prefix() != OptionDisplay.PrefixKind.LONG_OPTION &&
+                                            t.prefix() != OptionDisplay.PrefixKind.SLASH_OPTION)) {
+            throw new IllegalArgumentException("normalOption()では、ショートオプション・ロングオプション・スラッシュオプション以外生成できません。");
         }
-        if (displayName != null) {
-            if (!(prefix.equals("-") || prefix.equals("--") || prefix.equals("/") || prefix.isEmpty())) {
-                throw new IllegalArgumentException("Argument prefix must be \"-\" or \"--\" or \"/\" or empty.");
-            }
-            if (displayName.startsWith("-") || displayName.startsWith("--") || displayName.startsWith("/")) {
-                throw new IllegalArgumentException("Argument displayName cannot be \"-\" or \"--\" or \"/\"");
-            }
-        }
+        return new Option(
+                displays,
+                arg,
+                required,
+                description,
+                managementName,
+                false
+        );
+    }
 
-        this.prefix = prefix;
-        this.displayName = displayName;
-        this.argType = argType;
+    public static Option argument(ArgType arg, String description, String managementName) {
+        return new Option(
+                Set.of(),
+                arg,
+                true,
+                description,
+                managementName,
+                false
+        );
+    }
+
+    public Option toExclusive() {
+        if (type != ArgType.NONE) throw new IllegalStateException("typeがNONE以外のOptionは、排他にできません。");
+        return new Option(
+                displays,
+                type,
+                true,
+                description,
+                managementName,
+                true
+        );
     }
 
     /**
-     * 引数の種別。
+     * 文字列が自身のプレフィックス+内容(namesの要素一つ一つ)と等価か調べる。
+     *
+     * @param in 比較対象。
+     * @return 調べた結果。
      */
-    public enum ArgType {
-        /**
-         * このオプションは、整数を引数として受け取るということを意味します。
-         */
-        INTEGER,
-        /**
-         * このオプションは、真偽値を引数として受け取るということを意味します。
-         * @deprecated 代わりに、{@link #NONE}を使用することを推奨します。
-         */
-        @Deprecated BOOLEAN,
-        /**
-         * このオプションは、倍精度浮動小数点数を引数として受け取るということを意味します。
-         */
-        DOUBLE,
-        /**
-         * このオプションは、文字列を引数として受け取るということを意味します。
-         */
-        STRING,
-        /**
-         * このオプションは、引数としては何も受け取らず、存在するかどうか自体が真偽値として受け取られます。
-         */
-        NONE,
+    public boolean matches(String in) {
+        return displays.stream().anyMatch(n -> n.getFullDisplay().equals(in));
+    }
+
+    public Set<OptionDisplay> displays() {
+        return Set.copyOf(displays);
+    }
+
+    public ArgType type() {
+        return type;
+    }
+
+    public boolean required() {
+        return required;
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public String managementName() {
+        return managementName;
+    }
+
+    public boolean exclusive() {
+        return exclusive;
+    }
+
+    public Set<String> getFullDisplays() {
+        return this.displays()
+                .stream()
+                .map(OptionDisplay::getFullDisplay)
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (!(o instanceof Option option)) return false;
+
+        return required == option.required && exclusive == option.exclusive && displays.equals(option.displays) && type == option.type && Objects.equals(description, option.description) && managementName.equals(option.managementName);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = displays.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + Boolean.hashCode(required);
+        result = 31 * result + Objects.hashCode(description);
+        result = 31 * result + managementName.hashCode();
+        result = 31 * result + Boolean.hashCode(exclusive);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Option{");
+        sb.append("displays=").append(displays);
+        sb.append(", type=").append(type);
+        sb.append(", required=").append(required);
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", managementName='").append(managementName).append('\'');
+        sb.append(", exclusive=").append(exclusive);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
+    public Option clone() {
+        return new Option(Set.copyOf(displays), type, required, description, managementName, exclusive);
+    }
+
+    /**
+     * {@link Option}のテスト用クラス。コンストラクタが{@code private}で、テストできないため、テスト時にはこれを使う。
+     */
+    static final class TestOption extends Option {
+        TestOption(@NonNull Set<OptionDisplay> displays,
+                   @NonNull ArgType type,
+                   boolean required,
+                   String description,
+                   @NonNull String managementName,
+                   boolean exclusive) {
+            super(displays, type, required, description, managementName, exclusive);
+        }
     }
 }

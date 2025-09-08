@@ -7,30 +7,111 @@
  */
 
 package io.github.udonabe.commandanalyzer.option;
+
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class OptionTest {
-    /**
-     * Optionのインスタンス化を行うテストです。
-     * This is a test to instantiate Option.
-     */
+class OptionTest {
+
     @Test
-    void instantiate() {
-        //正常系:正しくインスタンス化できるか
-        Option option = new Option("-", "example", Option.ArgType.NONE);
+    void testInstantiate() {
+        Option opt = new Option.TestOption(
+                Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                        new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
+                ArgType.NONE,
+                true,
+                "This is a test option.",
+                "test-option",
+                false);
+        assertEquals(Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")), opt.displays());
+        assertEquals(ArgType.NONE, opt.type());
+        assertTrue(opt.required());
+        assertEquals("This is a test option.", opt.description());
+        assertEquals("test-option", opt.managementName());
+    }
 
-        //接頭辞の確認
-        assertEquals("-", option.getPrefix());
+    @Test
+    void testEquals() {
+        Option opt = new Option.TestOption(
+                Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                        new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
+                ArgType.NONE,
+                true,
+                "This is a test option.",
+                "test-option",
+                false);
+        Option equal = new Option.TestOption(
+                Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                        new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
+                ArgType.NONE,
+                true,
+                "This is a test option.",
+                "test-option",
+                false);
+        assertEquals(opt, equal);
+    }
 
-        //引数タイプの確認
-        assertEquals(Option.ArgType.NONE, option.getArgType());
+    @Test
+    void testHashCode() {
+        Option opt = new Option.TestOption(
+                Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                        new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
+                ArgType.NONE,
+                true,
+                "This is a test option.",
+                "test-option",
+                false);
+        Option equal = new Option.TestOption(
+                Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                        new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
+                ArgType.NONE,
+                true,
+                "This is a test option.",
+                "test-option",
+                false);
+        assertEquals(opt.hashCode(), equal.hashCode());
+    }
 
-        //表示名の確認
-        assertEquals("example", option.getDisplayName());
+    @Test
+    void testToString() {
+        Option opt = new Option.TestOption(
+                Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                        new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
+                ArgType.NONE,
+                true,
+                "This is a test option.",
+                "test-option",
+                false);
 
-        //異常系:引数に誤りがある場合、正しく例外を送出するか
-        assertThrows(IllegalArgumentException.class, () -> new Option("-", "", Option.ArgType.NONE));
+        final StringBuilder sb = new StringBuilder("Option{");
+        sb.append("displays=").append(Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")));
+        sb.append(", type=").append(ArgType.NONE);
+        sb.append(", required=").append(true);
+        sb.append(", description='").append("This is a test option.").append('\'');
+        sb.append(", managementName='").append("test-option").append('\'');
+        sb.append(", exclusive=").append(false);
+        sb.append('}');
+
+        assertEquals(sb.toString(), opt.toString());
+    }
+
+    @Test
+    void testClone() {
+        Option opt = new Option.TestOption(
+                Set.of(new OptionDisplay(OptionDisplay.PrefixKind.SHORT_OPTION, "e"),
+                        new OptionDisplay(OptionDisplay.PrefixKind.LONG_OPTION, "example")),
+                ArgType.NONE,
+                true,
+                "This is a test option.",
+                "test-option",
+                false);
+        Option cloned = opt.clone();
+        assertEquals(opt, cloned);
+        assertNotSame(opt, cloned);
     }
 }
