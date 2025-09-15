@@ -30,6 +30,8 @@ public sealed class Option implements Cloneable {
                    String description,
                    @NonNull String managementName,
                    boolean exclusive) {
+        Set<OptionDisplay> displaySeen = new HashSet<>();
+        if (displays.stream().anyMatch(t -> !displaySeen.add(t))) throw new IllegalArgumentException("表示が重複しています。");
         this.displays = displays;
         this.type = type;
         this.required = required;

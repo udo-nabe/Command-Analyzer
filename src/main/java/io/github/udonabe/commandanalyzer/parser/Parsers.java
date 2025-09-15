@@ -81,7 +81,7 @@ class Parsers {
         }
 
         try {
-            Map<String, ParseResult> result = argument.parse(options, it.next(), it);
+            Map<String, ParseResult> result = argument.parse(List.of(matched.get()), it.next(), it);
             options.remove(matched.get());
             return result;
         } catch (NoSuchElementException e) {
